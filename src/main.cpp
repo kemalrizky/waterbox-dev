@@ -12,7 +12,7 @@
 
 RTC_DS3231 rtc;
 
-long currentMillis = 0;
+long currntMillis = 0;
 long previousMillis = 0;
 int interval = 1000;
 boolean ledState = LOW;
@@ -32,11 +32,8 @@ float flow = 0;
 const int ledPinRED = 19;
 const int ledPinGREEN = 13;
 
-// LED Pin
-const int ledPin = 4;
-
-const char* ssid = "Sembilan Satu";
-const char* password = "sembilan";
+const char* ssid = "Buffriend";
+const char* password = "123456789";
 
 // Add your MQTT Broker IP address, example:
 const char* mqtt_server = "161.97.179.79";
@@ -90,6 +87,7 @@ void SPIFFSappendFile(const char * message){
     Serial.println("Append failed");
   }
   file.close();
+  Serial.println("___________________");
 }
 
 void IRAM_ATTR pulseCounter(){
@@ -114,8 +112,6 @@ void setupWiFi() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  WiFi.setAutoReconnect(true);
-  WiFi.persistent(true);
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
@@ -133,20 +129,32 @@ void callback(char* topic, byte* message, unsigned int length) {
 
 void reconnectMQTT() {
   // Loop until we're reconnected
-  while (!client.connected()) {
+  unsigned long currentMillis = millis();
+  if(!client.connected() && (currentMillis - previousMillis >=interval)) {
+    if (WiFi.status() != WL_CONNECTED){
+      Serial.println("Reconnecting to WiFi...");
+      WiFi.disconnect();
+      WiFi.begin(ssid, password);
+      Serial.println("");
+      Serial.println("WiFi connected");
+      Serial.println("IP address: ");
+      Serial.println(WiFi.localIP());
+    }
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
     if (client.connect("WaterboxClient")) {
+      digitalWrite(ledPinRED, LOW);
+      digitalWrite(ledPinGREEN, HIGH);
       Serial.println("connected");
       // Subscribe
       client.subscribe("esp32/output");
-    } else {
+    } 
+    else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
     }
+    previousMillis = currentMillis;
   }
 }
 
@@ -168,11 +176,11 @@ void setup() {
   }
 
   // ----RTC
-  if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
-    while (1);
-    }
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  // if (! rtc.begin()) {
+  //   Serial.println("Couldn't find RTC");
+  //   while (1);
+  //   }
+  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
   // ---Flow Sensor
   pulseCount = 0;
@@ -187,18 +195,19 @@ void setup() {
 }
 
 void loop() {
+  
+  
   // ----MQTT
+
   if (!client.connected()) {
     digitalWrite(ledPinRED, HIGH);
     digitalWrite(ledPinGREEN, LOW);
     reconnectMQTT();
   }
-  digitalWrite(ledPinRED, LOW);
-  digitalWrite(ledPinGREEN, HIGH);
   client.loop();
 
-  currentMillis = millis();
-  if (currentMillis - previousMillis > interval) {
+  currntMillis = millis();
+  if (currntMillis - previousMillis > interval) {
     pulse1Sec = pulseCount;
     pulseCount = 0;
 
@@ -232,19 +241,19 @@ void loop() {
 
     // SPIFFS
     SPIFFSappendFile(flowString);
-    Serial.println("___________________");
+    
   }
 
   // ----RTC
-  DateTime RTCnow = rtc.now();
-  String second = String(RTCnow.second());
-  String minute = String(RTCnow.minute());
-  String hour = String(RTCnow.hour());
-  String day = String(RTCnow.day());
-  String month = String(RTCnow.month());
-  String year = String(RTCnow.year());
+  // DateTime RTCnow = rtc.now();
+  // String second = String(RTCnow.second());
+  // String minute = String(RTCnow.minute());
+  // String hour = String(RTCnow.hour());
+  // String day = String(RTCnow.day());
+  // String month = String(RTCnow.month());
+  // String year = String(RTCnow.year());
   
-  Serial.print(day); Serial.print("-"); Serial.print(month); Serial.print("-"); Serial.print(year);
-  Serial.print(" ");
-  Serial.print(hour); Serial.print(":"); Serial.print(minute); Serial.print(":"); Serial.println(second);
+  // Serial.print(day); Serial.print("-"); Serial.print(month); Serial.print("-"); Serial.print(year);
+  // Serial.print(" ");
+  // Serial.print(hour); Serial.print(":"); Serial.print(minute); Serial.print(":"); Serial.println(second);
 }

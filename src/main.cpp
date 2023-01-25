@@ -5,8 +5,8 @@
 #include <Wire.h>
 #include <RTClib.h>
 #include <SPI.h>
-// #include <NTPClient.h>
-// #include <WiFiUdp.h>
+#include <Wire.h>
+#include <NTPClient.h>
 
 #define FLOW_SENSOR 15
 #define LED_RED 19
@@ -18,6 +18,10 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 RTC_DS3231 rtc;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
+const int I2C_ADDRESS = 0x68;
 
 long lastAttempt = 0;
 long lastCount = 0;
@@ -76,6 +80,102 @@ void spiffsAppendFile(const char * _content){
   file.close();
 }
 
+byte decToBcd(byte val) {
+  return ((val/10*16) + (val%10));
+}
+byte bcdToDec(byte val) {
+  return ((val/16*10) + (val%16));
+}
+
+void calibrateRTC() {
+  // Initialize a NTPClient to get time
+  timeClient.begin();
+  timeClient.setTimeOffset(25200);
+
+  while(!timeClient.update()) {
+    timeClient.forceUpdate();
+  }
+  String formattedDate = timeClient.getFormattedDate();
+  // Extract date
+  int splitT = formattedDate.indexOf("T");
+  String dayStamp = formattedDate.substring(0, splitT);
+  // Parse daystamp
+  String yearString = dayStamp.substring(2,4); 
+  uint8_t yearInt = yearString.toInt(); 
+  String monthString = dayStamp.substring(5,7); 
+  uint8_t monthInt = monthString.toInt(); 
+  String dateString = dayStamp.substring(8); 
+  uint8_t dateInt = dateString.toInt();
+
+  // Extract time
+  String timeStamp = formattedDate.substring(splitT+1, formattedDate.length()-1);
+  // Parse timestamp
+  String hourString = timeStamp.substring(0,2); 
+  uint8_t hourInt = hourString.toInt(); 
+  String minuteString = timeStamp.substring(3,5); 
+  uint8_t minuteInt = minuteString.toInt();
+  String secondString = timeStamp.substring(6); 
+  uint8_t secondInt = secondString.toInt(); 
+
+  // Calibrate RTC with NTP Formatted Date
+  Wire.beginTransmission(I2C_ADDRESS);
+  Wire.write(byte(0));
+  Wire.write(decToBcd(secondInt)); // second
+  Wire.write(decToBcd(minuteInt)); // minute
+  Wire.write(decToBcd(hourInt)); // hour
+  Wire.write(decToBcd(4));  // weekday
+  Wire.write(decToBcd(dateInt)); // date
+  Wire.write(decToBcd(monthInt));  // month
+  Wire.write(decToBcd(yearInt)); // year
+  Wire.write(byte(0));
+  Wire.endTransmission();
+}
+
+void getRTCdateTime() {
+  // Read bytes from RTC
+  Wire.beginTransmission(I2C_ADDRESS);
+  Wire.write(byte(0));
+  Wire.endTransmission();
+  Wire.requestFrom(I2C_ADDRESS, 7);
+
+  byte second = bcdToDec(Wire.read());
+  byte minute = bcdToDec(Wire.read());
+  byte hour = bcdToDec(Wire.read());
+  byte weekday = bcdToDec(Wire.read());
+  byte date = bcdToDec(Wire.read());
+  byte month = bcdToDec(Wire.read());
+  byte year = bcdToDec(Wire.read());
+
+  const char* days[] = {"Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"};
+  const char* months[] = {"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Augustus","September", "October", "November", "Desember"};
+
+  char buffer[3];
+  const char* AMPM = 0;
+
+  // Print time
+  Serial.print(" ");
+  Serial.print(date);
+  Serial.print(" ");
+  Serial.print(months[month-1]);
+  Serial.print(" 20");
+  Serial.print(year);
+  Serial.print(" ");
+  if (hour > 12) {
+    hour -= 12;
+    AMPM = " PM";
+  }
+  else AMPM = " AM";
+
+  Serial.print(hour);
+  Serial.print(":");
+  sprintf(buffer, "%02d", minute);
+  Serial.print(buffer);
+  Serial.print(":");
+  sprintf(buffer, "%02d", second);
+  Serial.print(buffer);
+  Serial.println(AMPM);
+}
+
 void setupWiFi() {
   delay(10);
   // We start by connecting to a WiFi network
@@ -84,7 +184,7 @@ void setupWiFi() {
   Serial.println(SSID);
   
   digitalWrite(LED_RED, HIGH);
-  
+
   WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -185,7 +285,7 @@ void sendMQTTmsg(const char * _topic, float _content, bool _saveSPIFFS = true){
 }
 
 void setup() {
-  SPI.begin(23,22);
+  Wire.begin(23, 22);           // RTC
   Serial.begin(115200);
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
@@ -202,12 +302,7 @@ void setup() {
   }
   spiffsWriteFile("Waterbox v2");
 
-  // ----RTC
-  // if (! rtc.begin()) {
-  //   Serial.println("Couldn't find RTC");
-  //   while (1);
-  //   }
-  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  calibrateRTC();
   
   attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
   
@@ -217,20 +312,7 @@ void loop() {
   reconnectMQTT();
   client.loop();
 
+  getRTCdateTime();
   getFlowrate();
   sendMQTTmsg("waterbox/W0002/flow_sensor/flowrate", flowRate);
-  
-
-  // ----RTC
-  // DateTime RTCnow = rtc.now();
-  // String second = String(RTCnow.second());
-  // String minute = String(RTCnow.minute());
-  // String hour = String(RTCnow.hour());
-  // String day = String(RTCnow.day());
-  // String month = String(RTCnow.month());
-  // String year = String(RTCnow.year());
-  
-  // Serial.print(day); Serial.print("-"); Serial.print(month); Serial.print("-"); Serial.print(year);
-  // Serial.print(" ");
-  // Serial.print(hour); Serial.print(":"); Serial.print(minute); Serial.print(":"); Serial.println(second);
 }

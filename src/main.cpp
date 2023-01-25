@@ -9,39 +9,27 @@
 // #include <WiFiUdp.h>
 
 #define FLOW_SENSOR 15
-
-RTC_DS3231 rtc;
-
-long currntMillis = 0;
-long previousMillis = 0;
-int interval = 1000;
-boolean ledState = LOW;
-float calibrationFactor = 4.5;
-volatile byte pulseCount;
-byte pulse1Sec = 0;
-float flowRate;
-unsigned int flowMilliLitres;
-unsigned long totalMilliLitres;
-unsigned long totalVolume;
-long lastMsg = 0;
-char msg[50];
-int value = 0;
-
-float flow = 0;
-
-const int ledPinRED = 19;
-const int ledPinGREEN = 13;
-
-const char* ssid = "Buffriend";
-const char* password = "123456789";
-
-// Add your MQTT Broker IP address, example:
-const char* mqtt_server = "161.97.179.79";
+#define LED_RED 19
+#define LED_GREEN 13
+#define SSID "Buffriend"
+#define PASSWORD "123456789"
+#define MQTT_SERVER "161.97.179.79"
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+RTC_DS3231 rtc;
 
-void SPIFFSreadFile() {
+long lastAttempt = 0;
+long lastCount = 0;
+long lastMsg = 0;
+
+volatile byte pulseCount;
+
+float flowRate = 0.0;
+unsigned long totalLitres = 0.0;
+unsigned long totalVolume = 0.0;
+
+void spiffsReadFile() {
     Serial.println("\nReading file");
 
     File file = SPIFFS.open("/test.txt");
@@ -53,19 +41,18 @@ void SPIFFSreadFile() {
     while(file.available()){
         Serial.write(file.read());
     }
-    Serial.println();
     file.close();
 }
 
-void SPIFFSwriteFile(){
-  Serial.println("\nWriting file");
+void spiffsWriteFile(const char * _content){
+  Serial.println("Writing file");
   
   File file = SPIFFS.open("/test.txt", FILE_WRITE);
   if(!file){
       Serial.println("Failed to open file for writing");
       return;
   }
-  if(file.println("Temperature data")){
+  if(file.println(_content)){
       Serial.println("File written");
   } 
   else {
@@ -74,24 +61,19 @@ void SPIFFSwriteFile(){
   file.close();
 }
 
-void SPIFFSappendFile(const char * message){
-  Serial.println("\nAppending to file");
+void spiffsAppendFile(const char * _content){
+  Serial.println("Appending to file");
   File file = SPIFFS.open("/test.txt", FILE_APPEND);
   if(!file){
     Serial.println("Failed to open file for appending");
     return;
   }
-  if(file.println(message)){
+  if(file.println(_content)){
     Serial.println("Message appended");
   } else {
     Serial.println("Append failed");
   }
   file.close();
-  Serial.println("___________________");
-}
-
-void IRAM_ATTR pulseCounter(){
-  pulseCount++;
 }
 
 void setupWiFi() {
@@ -99,10 +81,11 @@ void setupWiFi() {
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("\nConnecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, password);
-
+  Serial.println(SSID);
+  
+  digitalWrite(LED_RED, HIGH);
+  
+  WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -129,12 +112,15 @@ void callback(char* topic, byte* message, unsigned int length) {
 
 void reconnectMQTT() {
   // Loop until we're reconnected
-  unsigned long currentMillis = millis();
-  if(!client.connected() && (currentMillis - previousMillis >=interval)) {
+  unsigned long now = millis();
+  if(!client.connected() && (now - lastAttempt >= 5000)) {
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("Reconnecting to WiFi...");
       WiFi.disconnect();
-      WiFi.begin(ssid, password);
+      WiFi.begin(SSID, PASSWORD);
       Serial.println("");
       Serial.println("WiFi connected");
       Serial.println("IP address: ");
@@ -143,8 +129,8 @@ void reconnectMQTT() {
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
     if (client.connect("WaterboxClient")) {
-      digitalWrite(ledPinRED, LOW);
-      digitalWrite(ledPinGREEN, HIGH);
+      digitalWrite(LED_RED, LOW);
+      digitalWrite(LED_GREEN, HIGH);
       Serial.println("connected");
       // Subscribe
       client.subscribe("esp32/output");
@@ -154,26 +140,67 @@ void reconnectMQTT() {
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
     }
-    previousMillis = currentMillis;
+    lastAttempt = now;
+  }
+}
+
+void IRAM_ATTR pulseCounter(){
+  pulseCount++;
+}
+
+void getFlowrate(){
+  unsigned long now = millis();
+  if (now - lastCount > 1000) {
+    byte pulse1Sec = 0;
+    pulse1Sec = pulseCount;
+    pulseCount = 0;
+
+    float calibrationFactor = 4.5;
+    // Get Flowrate
+    flowRate = ((1000.0 / (millis() - lastCount)) * pulse1Sec) / calibrationFactor; // L/min
+    
+    // Get Volume
+    // unsigned int flowMilliLitres;        // Divide the flow rate in litres/minute by 60 to determine how many litres have passed through 
+    // flowLitres = (flowRate / 60);        // the sensor in this 1 second interval
+    // totalVolume += flowLitres;           
+    
+    lastCount = millis();
+  }
+}
+
+void sendMQTTmsg(const char * _topic, float _content, bool _saveSPIFFS = true){
+  unsigned long now = millis();
+  if (now - lastMsg > 5000) {           // send MQTT message every 5 second
+    // convert the value to a char array
+    char contentString[6];
+    dtostrf(_content, 3, 1, contentString);
+    // Serial.print("\nFlowrate: "); Serial.print(flowString); Serial.print("L/min"); Serial.print("\t");  
+    client.publish(_topic, contentString);
+
+    if (_saveSPIFFS == true){
+      spiffsAppendFile(contentString);
+    }
+    lastMsg = now;
   }
 }
 
 void setup() {
   SPI.begin(23,22);
   Serial.begin(115200);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
   // ----MQTT
   setupWiFi();
-  client.setServer(mqtt_server, 1883);
+  client.setServer(MQTT_SERVER, 1883);
   client.setCallback(callback);
 
-  pinMode(ledPinRED, OUTPUT);
-  pinMode(ledPinGREEN, OUTPUT);
 
   // ----SPIFFS
   if(!SPIFFS.begin(true)){
     Serial.println("An Error has occured while mounting SPIFFS");
     return;
   }
+  spiffsWriteFile("Waterbox v2");
 
   // ----RTC
   // if (! rtc.begin()) {
@@ -182,67 +209,17 @@ void setup() {
   //   }
   // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
-  // ---Flow Sensor
-  pulseCount = 0;
-  flowRate = 0.0;
-  previousMillis = 0;
-  flowMilliLitres = 0;
-  totalMilliLitres = 0;
-
   attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
-  SPIFFSwriteFile();
-
+  
 }
 
 void loop() {
-  
-  
-  // ----MQTT
-
-  if (!client.connected()) {
-    digitalWrite(ledPinRED, HIGH);
-    digitalWrite(ledPinGREEN, LOW);
-    reconnectMQTT();
-  }
+  reconnectMQTT();
   client.loop();
 
-  currntMillis = millis();
-  if (currntMillis - previousMillis > interval) {
-    pulse1Sec = pulseCount;
-    pulseCount = 0;
-
-    flowRate = ((1000.0 / (millis() - previousMillis)) * pulse1Sec) / calibrationFactor; // L/min
-    previousMillis = millis();
-    
-    // Divide the flow rate in litres/minute by 60 to determine how many litres have
-    // passed through the sensor in this 1 second interval, then multiply by 1000 to
-    // convert to millilitres.
-    flowMilliLitres = (flowRate / 60) * 1000;
-    totalMilliLitres += flowMilliLitres;
-    totalVolume = totalMilliLitres/1000;
-  }
-
-  long now = millis();
-  if (now - lastMsg > 5000) {           // send MQTT message every 5 second
-    lastMsg = now;
-    
-    // convert the value to a char array
-    char flowString[6];
-    dtostrf(flowRate, 3, 1, flowString);
-    Serial.print("\nFlowrate: "); Serial.print(flowString); Serial.print("L/min"); Serial.print("\t");  
-    client.publish("waterbox/W0002/flow_sensor/flowrate", flowString);
-
-    char volumeString[6];
-    dtostrf(totalVolume, 3, 1, volumeString);
-    Serial.print("Total Volume: "); Serial.print(totalVolume); Serial.println("L");
-    client.publish("waterbox/W0002/flow_sensor/total_volume", volumeString);
-
-
-
-    // SPIFFS
-    SPIFFSappendFile(flowString);
-    
-  }
+  getFlowrate();
+  sendMQTTmsg("waterbox/W0002/flow_sensor/flowrate", flowRate);
+  
 
   // ----RTC
   // DateTime RTCnow = rtc.now();

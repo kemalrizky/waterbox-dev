@@ -10,11 +10,11 @@
 #define FLOW_SENSOR 15
 #define LED_RED 19
 #define LED_GREEN 13
-#define ROUTER_SSID "Sembilan Satu"
-#define ROUTER_PASS "sembilan"
-#define MQTT_SERVER "161.97.179.79"
-#define AP_SSID "Waterbox 002"
-#define AP_PASS "Aquiferan"
+#define ROUTER_SSID "SSID"
+#define ROUTER_PASS "Password"
+#define MQTT_SERVER "MQTT Server"
+#define AP_SSID "AP"
+#define AP_PASS "Password"
 
 WiFiClient espClient;
 PubSubClient client(espClient);

@@ -2,7 +2,6 @@
 #include <PubSubClient.h>
 #include <WiFiAP.h>
 #include <WebServer.h>
-/* INCLUDE ESP2SOTA LIBRARY */
 #include <ESP2SOTA.h>
 #include <Wire.h>
 #include <Config.h>
@@ -180,11 +179,18 @@ void loop() {
     char flowrateString[6];
     dtostrf(flowRate, 3, 2, flowrateString);                                  // convert the value to a char array
     client.publish("waterbox/W0002/flow_sensor/flowrate", flowrateString);
+    Serial.print("Flowrate : ");
+    Serial.print(flowRate);
+    Serial.println(" L/min");
 
     // Send total volume data
     char volumeString[6];
     dtostrf(totalVolume, 3, 2, volumeString);                                 // convert the value to a char array
     client.publish("waterbox/W0002/flow_sensor/total_volume", volumeString);
+    Serial.print("Total Volume : ");
+    Serial.print(totalVolume);
+    Serial.println(" L");
+
     lastMsg = now;
   }
 

@@ -4,12 +4,12 @@
 #define LED_GREEN 13
 
 // Modem
-#define ROUTER_SSID "SSID"
-#define ROUTER_PASS "Password"
+#define MODEM_SSID "SSID"
+#define MODEM_PASS "Password"
 
 // MQTT Server
 #define MQTT_SERVER "MQTT Server"
 
 // ESP32 Access Point
-#define AP_SSID "AP"
-#define AP_PASS "Password"
+#define ESP_SSID "AP"
+#define ESP_PASS "Password"

@@ -190,6 +190,7 @@ void loop() {
     Serial.print("Total Volume : ");
     Serial.print(totalVolume);
     Serial.println(" L");
+    Serial.println();
 
     lastMsg = now;
   }

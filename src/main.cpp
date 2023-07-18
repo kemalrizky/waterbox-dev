@@ -19,7 +19,7 @@ volatile byte pulseCount;
 
 float flowRate = 0.0;
 unsigned long totalLitres = 0.0;
-unsigned long totalVolume = 0.0;
+float totalVolume = 0.0;
 byte pulse1Sec = 0;
 
 String pulse;

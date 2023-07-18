@@ -1,7 +1,7 @@
 // Peripherals
 #define FLOW_SENSOR 15
 #define LED_RED 19
-#define LED_GREEN 13
+#define LED_GREEN 23
 
 // Modem
 #define MODEM_SSID "SSID"

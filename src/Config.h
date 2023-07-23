@@ -4,12 +4,12 @@
 #define LED_GREEN 23
 
 // Modem
-#define MODEM_SSID "SSID"
-#define MODEM_PASS "Password"
+#define MODEM_SSID "Aquifera Modem"
+#define MODEM_PASS "Aquiferan123"
 
 // MQTT Server
-#define MQTT_SERVER "MQTT Server"
+#define MQTT_SERVER "161.97.179.79"
 
 // ESP32 Access Point
-#define ESP_SSID "AP"
-#define ESP_PASS "Password"
+#define ESP_SSID "Waterbox"
+#define ESP_PASS "waterboxaquifera"

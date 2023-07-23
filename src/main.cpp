@@ -124,7 +124,7 @@ void getFlowrate(){
     pulse1Sec = pulseCount;
     pulseCount = 0;
 
-    float calibrationFactor = 6.1;                                                    // variable to calibrate
+    float calibrationFactor = 6.9;                                                    // variable to calibrate
     // Get Flowrate
     flowRate = ((1000.0 / (millis() - lastCount)) * pulse1Sec) / calibrationFactor;   // uncomment for flowrate measurement in L/min
     // flowRate = flowRate / 60;                                                      // uncomment for flowrate measurement in L/s

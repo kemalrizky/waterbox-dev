@@ -14,7 +14,9 @@ long lastAttempt = 0;
 long lastCount = 0;
 long lastMsg = 0;
 long lastPul = 0;
+long lastIP = 0;
 
+String ipAddress = "";
 volatile byte pulseCount;
 
 double flowRate = 0.0;
@@ -44,10 +46,11 @@ void setupWiFi() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  while(!MDNS.begin("waterbox-0002")) {
-    Serial.println("Starting mDNS...");
-    delay(1000);
-  }
+  // Need works!
+  // while(!MDNS.begin("waterbox-0002")) {
+  //   Serial.println("Starting mDNS...");
+  //   delay(1000);
+  // }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {

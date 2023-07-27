@@ -17,9 +17,9 @@ long lastPul = 0;
 
 volatile byte pulseCount;
 
-float flowRate = 0.0;
-unsigned long totalLitres = 0.0;
-float totalVolume = 0.0;
+double flowRate = 0.0;
+double totalVolume = 0.0;
+double calibrationFactor = 6.1;                                                    // variable to calibrate
 byte pulse1Sec = 0;
 
 String pulse;
@@ -55,6 +55,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
     message += (char)payload[i];
   }
+  if (topic == "waterbox/W0002/calibration_factor"){
+    calibrationFactor = message.toDouble();
+  }
   Serial.println();
 }
 
@@ -68,7 +71,7 @@ void reconnectMQTT() {
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("Reconnecting to WiFi...");
       WiFi.disconnect();
-      WiFi.mode(WIFI_AP_STA);
+      WiFi.mode(WIFI_STA);
       WiFi.begin(MODEM_SSID, MODEM_PASS);
       Serial.println("");
       Serial.println("WiFi connected");
@@ -82,7 +85,7 @@ void reconnectMQTT() {
       digitalWrite(LED_GREEN, HIGH);
       Serial.println("connected");
       // Subscribe
-      client.subscribe("esp32/output");
+      client.subscribe("waterbox/W0002/calibration_factor");
     } 
     else {
       Serial.print("failed, rc=");
@@ -124,9 +127,9 @@ void getFlowrate(){
     pulse1Sec = pulseCount;
     pulseCount = 0;
 
-    float calibrationFactor = 6.9;                                                    // variable to calibrate
+    
     // Get Flowrate
-    flowRate = ((1000.0 / (millis() - lastCount)) * pulse1Sec) / calibrationFactor;   // uncomment for flowrate measurement in L/min
+    flowRate = ((1000.0 / (millis() - lastCount)) * pulse1Sec) * calibrationFactor;   // uncomment for flowrate measurement in L/min
     // flowRate = flowRate / 60;                                                      // uncomment for flowrate measurement in L/s
     
     // Get Volume
@@ -159,7 +162,7 @@ void setup() {
   client.setCallback(callback);
 
   // OTA feature, MUST HAVE LINE!
-  setupOTA();
+  // setupOTA();
   
   // Flowsensor
   attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
@@ -196,9 +199,9 @@ void loop() {
   }
 
   // Calibration purpose
-  sendFlowSensorPulse();                // uncomment to send measured pulse per second by the flow sensor to the cloud
+  // sendFlowSensorPulse();                // uncomment to send measured pulse per second by the flow sensor to the cloud
   
   // OTA feature, MUST HAVE LINE!
-  server.handleClient();                // Handle update requests
-  delay(5);
+  // server.handleClient();                // Handle update requests
+  // delay(5);
 }

@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include <WiFiAP.h>
+#include <ESPmDNS.h>
 #include <WebServer.h>
 #include <ESP2SOTA.h>
 #include <Wire.h>
@@ -19,7 +19,7 @@ volatile byte pulseCount;
 
 double flowRate = 0.0;
 double totalVolume = 0.0;
-double calibrationFactor = 6.1;                                                    // variable to calibrate
+double calibrationFactor = 0.117;                                                    // variable to calibrate
 byte pulse1Sec = 0;
 
 String pulse;
@@ -32,7 +32,7 @@ void setupWiFi() {
   Serial.println(MODEM_SSID);
   
   digitalWrite(LED_RED, HIGH);
-  WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(MODEM_SSID, MODEM_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -43,6 +43,11 @@ void setupWiFi() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+
+  while(!MDNS.begin("waterbox-0002")) {
+    Serial.println("Starting mDNS...");
+    delay(1000);
+  }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -61,12 +66,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 }
 
+void turnOnLED(bool MQTTconnected){
+  if (MQTTconnected == true) {
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_GREEN, HIGH);
+  }
+  else {
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+  }
+  
+}
+
 void reconnectMQTT() {
   // Loop until we're reconnected
   unsigned long now = millis();
   if(!client.connected() && (now - lastAttempt >= 5000)) {
-    digitalWrite(LED_RED, HIGH);
-    digitalWrite(LED_GREEN, LOW);
+    turnOnLED(client.connected());
 
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("Reconnecting to WiFi...");
@@ -81,8 +97,7 @@ void reconnectMQTT() {
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
     if (client.connect("WaterboxClient")) {
-      digitalWrite(LED_RED, LOW);
-      digitalWrite(LED_GREEN, HIGH);
+      turnOnLED(client.connected());
       Serial.println("connected");
       // Subscribe
       client.subscribe("waterbox/W0002/calibration_factor");
@@ -97,15 +112,7 @@ void reconnectMQTT() {
 }
 
 void setupOTA(){
-  WiFi.softAP(ESP_SSID, ESP_PASS);
   delay(1000);
-  IPAddress IP = IPAddress (192, 168, 0, 199);
-  IPAddress NMask = IPAddress (255, 255, 255, 0);
-  WiFi.softAPConfig(IP, IP, NMask);
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
-
   /* SETUP YOR WEB OWN ENTRY POINTS */
   server.on("/myurl", HTTP_GET, []() {
   server.sendHeader("Connection", "close");
@@ -127,7 +134,6 @@ void getFlowrate(){
     pulse1Sec = pulseCount;
     pulseCount = 0;
 
-    
     // Get Flowrate
     flowRate = ((1000.0 / (millis() - lastCount)) * pulse1Sec) * calibrationFactor;   // uncomment for flowrate measurement in L/min
     // flowRate = flowRate / 60;                                                      // uncomment for flowrate measurement in L/s
@@ -162,7 +168,7 @@ void setup() {
   client.setCallback(callback);
 
   // OTA feature, MUST HAVE LINE!
-  // setupOTA();
+  setupOTA();
   
   // Flowsensor
   attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
@@ -202,6 +208,6 @@ void loop() {
   // sendFlowSensorPulse();                // uncomment to send measured pulse per second by the flow sensor to the cloud
   
   // OTA feature, MUST HAVE LINE!
-  // server.handleClient();                // Handle update requests
-  // delay(5);
+  server.handleClient();                // Handle update requests
+  delay(5);
 }

@@ -7,7 +7,7 @@
 #include <Config.h>
 
 WiFiClient espClient;
-PubSubClient client(espClient);
+PubSubClient MQTTclient(espClient);
 WebServer server(80);
 
 long lastAttempt = 0;
@@ -16,15 +16,15 @@ long lastMsg = 0;
 long lastPul = 0;
 long lastIP = 0;
 
-String ipAddress = "";
 volatile byte pulseCount;
+String pulse;
 
 double flowRate = 0.0;
 double totalVolume = 0.0;
 double calibrationFactor = 0.117;                                                    // variable to calibrate
 byte pulse1Sec = 0;
 
-String pulse;
+
 
 void setupWiFi() {
   delay(10);
@@ -58,15 +58,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(topic);
   Serial.print(". Message: ");
   String message;
+
+  String mqttInCalibratFactor = "waterbox/W0002/calibration_factor";
   
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
     message += (char)payload[i];
   }
-  if (topic == "waterbox/W0002/calibration_factor"){
-    calibrationFactor = message.toDouble();
-  }
+  
+  calibrationFactor = message.toDouble();
+  
   Serial.println();
+  Serial.print("Calibration factor: ");
+  Serial.println(calibrationFactor, 5);
 }
 
 void turnOnLED(bool MQTTconnected){
@@ -84,8 +88,8 @@ void turnOnLED(bool MQTTconnected){
 void reconnectMQTT() {
   // Loop until we're reconnected
   unsigned long now = millis();
-  if(!client.connected() && (now - lastAttempt >= 5000)) {
-    turnOnLED(client.connected());
+  if(!MQTTclient.connected() && (now - lastAttempt >= 1000)) {
+    turnOnLED(MQTTclient.connected());
 
     if (WiFi.status() != WL_CONNECTED){
       Serial.println("Reconnecting to WiFi...");
@@ -99,16 +103,16 @@ void reconnectMQTT() {
     }
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("WaterboxClient")) {
-      turnOnLED(client.connected());
+    if (MQTTclient.connect("WaterboxClient")) {
+      turnOnLED(MQTTclient.connected());
       Serial.println("connected");
       // Subscribe
-      client.subscribe("waterbox/W0002/calibration_factor");
+      MQTTclient.subscribe("waterbox/W0002/calibration_factor");
     } 
     else {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.print(MQTTclient.state());
+      Serial.println(" try again in 1 seconds");
     }
     lastAttempt = now;
   }
@@ -155,7 +159,7 @@ void sendFlowSensorPulse(){
   // Calibration
   unsigned long now = millis();
   if (now - lastPul > 5000) {
-    client.publish("waterbox/W0002/flow_sensor/pulse", pulse.c_str());
+    MQTTclient.publish("waterbox/W0002/flow_sensor/pulse", pulse.c_str());
     lastPul = now;
   }
 }
@@ -167,8 +171,8 @@ void setup() {
   pinMode(LED_GREEN, OUTPUT);
   // MQTT
   setupWiFi();
-  client.setServer(MQTT_SERVER, 1883);
-  client.setCallback(callback);
+  MQTTclient.setServer(MQTT_SERVER, 1883);
+  MQTTclient.setCallback(callback);
 
   // OTA feature, MUST HAVE LINE!
   setupOTA();
@@ -180,17 +184,17 @@ void setup() {
 
 void loop() {
   reconnectMQTT();
-  client.loop();
+  MQTTclient.loop();
 
   getFlowrate();
   
   unsigned long now = millis();
-  if (now - lastMsg > 5000) {           // send MQTT message every 5 second
+  if (now - lastMsg > 2000) {           // send MQTT message every 2 second
     
     // Send flowrate data
     char flowrateString[6];
     dtostrf(flowRate, 3, 2, flowrateString);                                  // convert the value to a char array
-    client.publish("waterbox/W0002/flow_sensor/flowrate", flowrateString);
+    MQTTclient.publish("waterbox/W0002/flow_sensor/flowrate", flowrateString);
     Serial.print("Flowrate : ");
     Serial.print(flowRate);
     Serial.println(" L/min");
@@ -198,7 +202,7 @@ void loop() {
     // Send total volume data
     char volumeString[6];
     dtostrf(totalVolume, 3, 2, volumeString);                                 // convert the value to a char array
-    client.publish("waterbox/W0002/flow_sensor/total_volume", volumeString);
+    MQTTclient.publish("waterbox/W0002/flow_sensor/total_volume", volumeString);
     Serial.print("Total Volume : ");
     Serial.print(totalVolume);
     Serial.println(" L");

@@ -8,7 +8,7 @@ Some features that it has are the following:
 - OTA updates
 
 ---
-![](docs\waterbox v1.2.jpg)
+![](docs/waterbox%20v1.2.jpg)
 
 
 ## Waterbox Enclosure Plugout

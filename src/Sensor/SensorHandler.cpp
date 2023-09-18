@@ -45,7 +45,7 @@ void SensorHandler::publish() {
         delete[] topic;
 
         mqttHandler.measurement = "volume";
-        char * topic = mqttHandler.generateTopic();
+        topic = mqttHandler.generateTopic();
         mqttHandler.publishData(topic, volume);
         Serial.print("Total Volume : ");
         Serial.print(volume);

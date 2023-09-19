@@ -1,7 +1,10 @@
 #include "InternetHandler.h"
 
-InternetHandler internethandler;
+InternetHandler internetHandler;
 WiFiClient wifiClient;
+
+const char *wifiSsid = WIFI_SSID;
+const char *wifiPass = WIFI_PASS;
 
 void InternetHandler::wifiSetup() {
     WiFi.mode(WIFI_STA);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "credentials.h"
-const char *mqttServer = MQTT_SERVER;
 #include "Misc\WaterboxId.h"
 #include "InternetHandler.h"
 

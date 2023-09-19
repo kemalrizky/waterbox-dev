@@ -7,7 +7,7 @@ SensorHandler::SensorHandler() {
 }
 
 void IRAM_ATTR pulseCounter() {
-    pulseCount++;
+    sensorHandler.pulseCount++;
 }
 
 void SensorHandler::setup() {

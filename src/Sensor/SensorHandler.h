@@ -8,6 +8,10 @@
 
 class SensorHandler {
     public:
+     volatile byte pulseCount;
+     unsigned long lastRead;
+     unsigned long lastPublish; 
+
      float flowRate;
      float volume;
      float calibrationFactor;
@@ -17,9 +21,7 @@ class SensorHandler {
      SensorHandler();
 };
 
-volatile byte pulseCount;
-unsigned long lastRead;
-unsigned long lastPublish;
+
 
 void IRAM_ATTR pulseCounter();
 

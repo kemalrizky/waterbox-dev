@@ -2,8 +2,6 @@
 
 #include "Global.h"
 #include "credentials.h"
-const char *wifiSsid = WIFI_SSID;
-const char *wifiPass = WIFI_PASS;
 
 class InternetHandler{
     public:

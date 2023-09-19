@@ -3,6 +3,8 @@ MqttHandler mqttHandler;
 
 PubSubClient mqttClient;
 
+const char *mqttServer = MQTT_SERVER;
+
 MqttHandler::MqttHandler() {
     mqttHandler.device = "waterbox";
     mqttHandler.deviceId = waterbox.id;

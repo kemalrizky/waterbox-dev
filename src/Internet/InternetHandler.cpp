@@ -1,47 +1,10 @@
 #include "InternetHandler.h"
 
-InternetHandler internetHandler;
-WiFiClient wifiClient;
-
 const char *wifiSsid = WIFI_SSID;
 const char *wifiPass = WIFI_PASS;
 
 void InternetHandler::wifiSetup() {
     WiFi.mode(WIFI_STA);
-}
-
-void InternetHandler::initConnect() {
-    delay(10);
-    unsigned long lastAttempt = millis();
-
-    Serial.println("\nInitializing WiFi connection...");
-
-    WiFi.begin(wifiSsid, wifiPass);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-        
-        // give up connection attempt if failed to connect after trying for 10 second
-        unsigned long now = millis();
-        if (lastAttempt - now > 5000){
-            lastAttempt = millis();
-            break;
-        }
-    }
-    Serial.println("\nWiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-}
-
-void InternetHandler::connect() {
-    Serial.println("\nConnecting to WiFi...");
-    
-    WiFi.disconnect();
-    WiFi.begin(wifiSsid, wifiPass);
-    
-    Serial.println("\nWiFi connected");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
 }
 
 bool InternetHandler::isConnected() {
@@ -53,3 +16,24 @@ bool InternetHandler::isConnected() {
     }
 }
 
+bool InternetHandler::connect() {
+    Serial.println("\nConnecting to WiFi...");
+    
+    if (isConnected()) {
+        WiFi.disconnect();
+    }
+    
+    WiFi.begin(wifiSsid, wifiPass);
+
+    if (!isConnected()) {
+        Serial.println("\nWiFi connection failed");
+        return false;
+    }
+    else {
+        Serial.println("\nWiFi connected");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return true;
+    }
+    
+}

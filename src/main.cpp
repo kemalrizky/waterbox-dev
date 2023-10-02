@@ -1,28 +1,41 @@
-// must mantain this order of dependency
 #include "Global.h"
-#include "Misc\WaterboxId.h" 
 #include "Internet\InternetHandler.h"
 #include "Internet\MqttHandler.h"
-#include "WebServer\WebServerHandler.h"
+#include "OTA\OtaHandler.h"
 #include "Sensor\SensorHandler.h"
+
+InternetHandler internetHandler;
+MqttHandler mqttHandler;
+OtaHandler otaHandler;
+SensorHandler sensorHandler(0.117);
 
 void setup() {
   Serial.begin(115200);
   internetHandler.wifiSetup();
-  internetHandler.initConnect();
+  internetHandler.connect();
 
   mqttHandler.setup();
 
-  webServerHandler.init();
+  otaHandler.initServer();
   sensorHandler.setup();
 }
 
 void loop() {
-  mqttHandler.mantainConnection();
+  sensorHandler.readFlowrate();
+  sensorHandler.calculateVolume();
+
+  if(!mqttHandler.isConnected()) {              // Check if Waterbox is connected to MQTTClient
+    if(!internetHandler.isConnected()) {
+      internetHandler.connect();                // Connect to WiFi
+    }
+    mqttHandler.connect();                      // Connect to MQTT Broker
+  }
+  else {
+    mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", sensorHandler.getFlowrate());
+    mqttHandler.publish("waterbox/W0002/flow_sensor/volume", sensorHandler.getVolume());
+  }
+
   mqttHandler.loop();
 
-  sensorHandler.read();
-  sensorHandler.publish();
-
-  webServerHandler.handleReq();
+  otaHandler.handleReq();
 }

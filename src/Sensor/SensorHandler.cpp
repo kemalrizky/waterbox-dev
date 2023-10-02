@@ -1,60 +1,56 @@
 #include "SensorHandler.h"
 
-SensorHandler sensorHandler;
+SensorHandler* SensorHandler::instance = nullptr; // Initialize the static pointer
 
-SensorHandler::SensorHandler() {
-    sensorHandler.calibrationFactor = 0.117;
+
+SensorHandler::SensorHandler(float _calibrationFactor): calibrationFactor(_calibrationFactor) {
+    instance = this;
 }
 
-void IRAM_ATTR pulseCounter() {
-    sensorHandler.pulseCount++;
+void IRAM_ATTR SensorHandler::pulseCounter() {
+    if (instance != nullptr) {
+        instance->pulseCount++;
+    }
 }
 
 void SensorHandler::setup() {
     attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
 }
 
-void SensorHandler::read() {
+void SensorHandler::readFlowrate() {
     unsigned long now = millis();
     if (now - lastRead > 1000) {
-        byte pulse1Sec = 0;
-        pulse1Sec = pulseCount;
+        noInterrupts();
+        byte pulse1Sec = pulseCount;
         pulseCount = 0;
+        interrupts();
 
         // Get Flowrate
-        sensorHandler.flowRate = ((1000.0 / (millis() - lastRead)) * pulse1Sec) * sensorHandler.calibrationFactor;   // uncomment for flowrate measurement in L/min
-        // sensorHandler.flowRate = sensorHandler.flowRate / 60;                                                     // uncomment for flowrate measurement in L/s
+        flowRate = float(pulse1Sec) * calibrationFactor * (1000.0 / (millis() - now));   // uncomment for flowrate measurement in L/s
         
-        // Get Volume
-        sensorHandler.volume += (sensorHandler.flowRate / 60) ;                                                  // uncomment for volume measurement in Litres 
-        
-        lastRead = millis();
+        lastRead = now;
+        isFlowrateRead = true;
+    }
+    else {
+        isFlowrateRead = false;
     }
 }
 
-void SensorHandler::publish() {
-    unsigned long now = millis();
-    if (now - lastPublish > 1000) {
-        mqttHandler.measurement = "waterbox";
-        char * topic = mqttHandler.generateTopic();
-        mqttHandler.publishData(topic, flowRate);
-        Serial.print("Flowrate : ");
-        Serial.print(flowRate);
-        Serial.println(" L/min");
-
-        delete[] topic;
-
-        mqttHandler.measurement = "volume";
-        topic = mqttHandler.generateTopic();
-        mqttHandler.publishData(topic, volume);
-        Serial.print("Total Volume : ");
-        Serial.print(volume);
-        Serial.println(" L");
-        Serial.println();
-
-        delete[] topic;
-
-        lastPublish = now;
-    } 
+void SensorHandler::calculateVolume() {
+    if(isFlowrateRead) {
+        volume += flowRate; 
+    }
 }
+
+float SensorHandler::getFlowrate() {
+    float _flowRate = flowRate;
+    return _flowRate;
+}
+
+float SensorHandler::getVolume() {
+    float _volume = volume;
+    return _volume;
+}
+
+
 

@@ -7,7 +7,7 @@
 InternetHandler internetHandler;
 MqttHandler mqttHandler;
 OtaHandler otaHandler;
-SensorHandler sensorHandler(0.117);
+SensorHandler sensorHandler;
 
 void setup() {
   Serial.begin(115200);
@@ -18,6 +18,7 @@ void setup() {
 
   otaHandler.initServer();
   sensorHandler.setup();
+  sensorHandler.setCalibrationFactor(0.117);
 }
 
 void loop() {
@@ -30,7 +31,8 @@ void loop() {
     }
     mqttHandler.connect();                      // Connect to MQTT Broker
   }
-  else {
+
+  if(mqttHandler.isConnected() && sensorHandler.isFlowrateRead == true) {
     mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", sensorHandler.getFlowrate());
     mqttHandler.publish("waterbox/W0002/flow_sensor/volume", sensorHandler.getVolume());
   }

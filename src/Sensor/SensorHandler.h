@@ -7,8 +7,9 @@
 
 class SensorHandler {
     public:
-     SensorHandler(float _calibrationFactor);
+     SensorHandler();
      void setup();
+     void setCalibrationFactor(float);
      void readFlowrate();
      void calculateVolume();
      float getFlowrate();

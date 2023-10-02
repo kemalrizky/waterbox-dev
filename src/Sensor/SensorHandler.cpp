@@ -3,7 +3,7 @@
 SensorHandler* SensorHandler::instance = nullptr; // Initialize the static pointer
 
 
-SensorHandler::SensorHandler(float _calibrationFactor): calibrationFactor(_calibrationFactor) {
+SensorHandler::SensorHandler() : calibrationFactor(1.0) {
     instance = this;
 }
 
@@ -15,6 +15,10 @@ void IRAM_ATTR SensorHandler::pulseCounter() {
 
 void SensorHandler::setup() {
     attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
+}
+
+void SensorHandler::setCalibrationFactor(float _calibrationFactor) {
+    calibrationFactor = _calibrationFactor;
 }
 
 void SensorHandler::readFlowrate() {

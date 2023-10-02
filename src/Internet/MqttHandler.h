@@ -1,35 +1,24 @@
 #pragma once
 
+#include "Global.h"
 #include "credentials.h"
-#include "Misc\WaterboxId.h"
-#include "InternetHandler.h"
-
 #include <PubSubClient.h>
-extern PubSubClient mqttClient;
+#include <WiFi.h>
 
 class MqttHandler{
     public:
-     String device;
-     String deviceId;
-     String sensor;
-     String measurement;
-
-     MqttHandler();
-
      void setup();
      bool connect();
-     void mantainConnection();
-     bool publishData(char *, float);
-     void subscribe(char *);
+     bool publish(String, float);
+     void subscribe(String);
      void loop();
-     char * generateTopic();
+     bool isConnected();
     
     private:
-     char * assignClientId();
+     WiFiClient wifiClient;
+     PubSubClient mqttClient;
 };
 
 void callback(char *, byte *, unsigned int);
-
-extern MqttHandler mqttHandler;
 
 

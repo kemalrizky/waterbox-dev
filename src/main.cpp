@@ -27,15 +27,22 @@ void loop() {
   sensorHandler.readFlowrate();
   sensorHandler.calculateVolume();
 
+  // Mantaining mqtt connection
   if(!mqttHandler.isConnected()) {              
     ledHandler.turnOff(CONNECTION_LED_PINOUT);
 
     if(!internetHandler.isConnected()) {
-      internetHandler.connect();                
+      if(internetHandler.connect()) {
+        if(mqttHandler.connect()) {
+          ledHandler.turnOn(CONNECTION_LED_PINOUT);
+        }
+      }                
     }
-    if(mqttHandler.connect()) {
-      ledHandler.turnOn(CONNECTION_LED_PINOUT);
-    }                      
+    else {
+      if(mqttHandler.connect()) {
+        ledHandler.turnOn(CONNECTION_LED_PINOUT);
+      }
+    }                   
   }
 
   if(mqttHandler.isConnected() && sensorHandler.isFlowrateRead == true) {

@@ -15,9 +15,6 @@ void OtaHandler::initServer() {
         ESP2SOTA.begin(server);
         server->begin();
     }
-    else {
-        Serial.println("Web server initialized.");
-    }
 }
 
 void OtaHandler::handleReq() {

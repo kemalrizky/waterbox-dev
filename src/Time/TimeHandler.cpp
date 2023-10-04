@@ -38,6 +38,6 @@ bool TimeHandler::updateTime() {
 }
 
 unsigned long TimeHandler::getCurrentTime() {
-    unsigned long _currentTime = currentTime + (millis() - lastUpdate);
+    unsigned long _currentTime = currentTime + round((millis() - lastUpdate)/1000);
     return _currentTime;
 }

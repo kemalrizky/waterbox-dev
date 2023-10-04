@@ -9,10 +9,9 @@ class SpiffsHandler {
      SpiffsHandler();
      void init();
      String readFile();
-     void appendFile(const char *);
+     void appendFile(float, unsigned long);
      void emptyFile();
      
     private:
      String path;
-
 };

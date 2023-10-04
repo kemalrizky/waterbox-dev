@@ -25,11 +25,15 @@ String SpiffsHandler::readFile() {
     return _content;
 }
 
-void SpiffsHandler::appendFile(const char *_message) {
+void SpiffsHandler::appendFile(float _data, unsigned long _timestamp) {
+    char _dataChar[7];                     // max 999.99
+    dtostrf(_data, 3, 2, _dataChar);
+    String _payload = String(_dataChar) + "," + String(_timestamp) + ";";
+    
     File file = SPIFFS.open(path, FILE_APPEND);
 
     if(file) {
-        if(file.print(_message)) {
+        if(file.print(_payload.c_str())) {
             Serial.println("File appended succesfully");
         }
         else {

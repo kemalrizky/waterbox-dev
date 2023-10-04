@@ -1,6 +1,6 @@
 #include "Global.h"
-#include "Internet\InternetHandler.h"
-#include "Internet\MqttHandler.h"
+#include "MQTT\InternetHandler.h"
+#include "MQTT\MqttHandler.h"
 #include "OTA\OtaHandler.h"
 #include "Sensor\SensorHandler.h"
 #include "Misc\LedHandler.h"

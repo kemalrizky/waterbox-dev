@@ -1,60 +1,36 @@
 #include "SensorHandler.h"
+#include "global.h"
 
-SensorHandler* SensorHandler::instance = nullptr; // Initialize the static pointer
-
+SensorHandler* SensorHandler::pSensorHandler = nullptr; // Initialize the static pointer
 
 SensorHandler::SensorHandler() : calibrationFactor(1.0) {
-    instance = this;
+    pSensorHandler = this;
 }
 
-void IRAM_ATTR SensorHandler::pulseCounter() {
-    if (instance != nullptr) {
-        instance->pulseCount++;
+void IRAM_ATTR SensorHandler::onInterrupt() {
+    if (pSensorHandler != nullptr) {
+        pSensorHandler->pulseCount++;
     }
 }
 
-void SensorHandler::setup() {
-    attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
+void SensorHandler::init() {
+    attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), onInterrupt, FALLING);
 }
 
 void SensorHandler::setCalibrationFactor(float _calibrationFactor) {
     calibrationFactor = _calibrationFactor;
 }
 
-void SensorHandler::readFlowrate() {
-    unsigned long now = millis();
-    if (now - lastRead > 1000) {
-        noInterrupts();
-        byte pulse1Sec = pulseCount;
-        pulseCount = 0;
-        interrupts();
+void SensorHandler::readData(WaterFlowData *s_waterflowdata) {
+    noInterrupts();
+    byte pulse_per_sec = pulseCount;
+    pulseCount = 0;
+    // Get Flowrate
+    float _flowRate = float(pulse_per_sec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
+    s_waterflowdata->flowRate = _flowRate;
+    s_waterflowdata->totalVolume += _flowRate;
 
-        // Get Flowrate
-        flowRate = float(pulse1Sec) * calibrationFactor * (1000.0 / (millis() - now));   // uncomment for flowrate measurement in L/s
-        
-        lastRead = now;
-        isFlowrateRead = true;
-    }
-    else {
-        isFlowrateRead = false;
-    }
+    interrupts();
 }
-
-void SensorHandler::calculateVolume() {
-    if(isFlowrateRead) {
-        volume += flowRate; 
-    }
-}
-
-float SensorHandler::getFlowrate() {
-    float _flowRate = flowRate;
-    return _flowRate;
-}
-
-float SensorHandler::getVolume() {
-    float _volume = volume;
-    return _volume;
-}
-
 
 

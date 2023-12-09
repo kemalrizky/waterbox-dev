@@ -16,43 +16,42 @@ void setup() {
   ledHandler.setup();
   ledHandler.turnOn(POWER_LED_PINOUT);
   internetHandler.init();
-  internetHandler.connect();
   mqttHandler.setup();
-  otaHandler.initServer();
-  sensorHandler.setup();
+  otaHandler.init();
+  sensorHandler.init();
   sensorHandler.setCalibrationFactor(0.117);
 }
 
 void loop() {
-  sensorHandler.readFlowrate();
-  sensorHandler.calculateVolume();
+  // sensorHandler.readFlowrate();
+  // sensorHandler.calculateVolume();
 
-  // Mantaining mqtt connection
-  if(!mqttHandler.isConnected()) {              
-    ledHandler.turnOff(CONNECTION_LED_PINOUT);
+  // // Mantaining mqtt connection
+  // if(!mqttHandler.isConnected()) {              
+  //   ledHandler.turnOff(CONNECTION_LED_PINOUT);
 
-    if(!internetHandler.isConnected()) {
-      if(internetHandler.connect()) {
-        if(mqttHandler.connect()) {
-          ledHandler.turnOn(CONNECTION_LED_PINOUT);
-        }
-      }                
-    }
-    else {
-      if(mqttHandler.connect()) {
-        ledHandler.turnOn(CONNECTION_LED_PINOUT);
-      }
-    }                   
-  }
+  //   if(!internetHandler.isConnected()) {
+  //     if(internetHandler.connect()) {
+  //       if(mqttHandler.connect()) {
+  //         ledHandler.turnOn(CONNECTION_LED_PINOUT);
+  //       }
+  //     }                
+  //   }
+  //   else {
+  //     if(mqttHandler.connect()) {
+  //       ledHandler.turnOn(CONNECTION_LED_PINOUT);
+  //     }
+  //   }                   
+  // }
 
-  if(mqttHandler.isConnected() && sensorHandler.isFlowrateRead == true) {
-    if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", sensorHandler.getFlowrate()) || 
-        mqttHandler.publish("waterbox/W0002/flow_sensor/volume", sensorHandler.getVolume())) {
-      ledHandler.blink(DATA_LED_PINOUT);
-    }
-  }
+  // if(mqttHandler.isConnected() && sensorHandler.isFlowrateRead == true) {
+  //   if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", sensorHandler.getFlowrate()) || 
+  //       mqttHandler.publish("waterbox/W0002/flow_sensor/volume", sensorHandler.getVolume())) {
+  //     ledHandler.blink(DATA_LED_PINOUT);
+  //   }
+  // }
 
   mqttHandler.loop();
 
-  otaHandler.handleReq();
+  otaHandler.handleRequest();
 }

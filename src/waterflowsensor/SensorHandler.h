@@ -1,33 +1,27 @@
 #ifndef SENSOR_HANDLER_H
 #define SENSOR_HANDLER_H
 
-#include "global.h"
 #include <Wire.h>
 
 #define FLOW_SENSOR 15
 
+struct WaterFlowData {
+    float flowRate;
+    float totalVolume;
+};
+
 class SensorHandler {
     public:
      SensorHandler();
-     void setup();
+     void init();
      void setCalibrationFactor(float);
-     void readFlowrate();
-     void calculateVolume();
-     float getFlowrate();
-     float getVolume();
-
-     bool isFlowrateRead;
+     void readData(WaterFlowData *);
 
     private:
-     static SensorHandler* instance;
-     static void IRAM_ATTR pulseCounter();
+     static SensorHandler* pSensorHandler;
+     static void IRAM_ATTR onInterrupt();
 
-     volatile byte pulseCount;
-     unsigned long lastRead;
-     unsigned long lastPublish; 
-     
-     float flowRate;
-     float volume;
+     volatile unsigned int pulseCount;
      float calibrationFactor;
 };
 

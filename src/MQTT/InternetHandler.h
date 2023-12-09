@@ -1,13 +1,15 @@
-#pragma once
+#ifndef INTERNET_HANDLER_H
+#define INTERNET_HANDLER_H
 
-#include "Global.h"
-#include "credentials.h"
+#include "global.h"
+#include "wifi_credentials.h"
 #include <WiFi.h>
 
 class InternetHandler{
     public:
-     void wifiSetup();
+     void init();
      bool connect();
      bool isConnected();
 };
 
+#endif

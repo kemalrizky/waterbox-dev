@@ -1,6 +1,7 @@
-#pragma once
+#ifndef SENSOR_HANDLER_H
+#define SENSOR_HANDLER_H
 
-#include "Global.h"
+#include "global.h"
 #include <Wire.h>
 
 #define FLOW_SENSOR 15
@@ -29,3 +30,5 @@ class SensorHandler {
      float volume;
      float calibrationFactor;
 };
+
+#endif

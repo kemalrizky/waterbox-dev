@@ -1,8 +1,8 @@
-#pragma once
+#ifndef WIFI_CREDENTIALS_H
+#define WIFI_CREDENTIALS_H
 
 // Modem
 #define WIFI_SSID "Sembilan Satu"
 #define WIFI_PASS "sembilan"
 
-// MQTT Server
-#define MQTT_SERVER "161.97.179.79"
+#endif

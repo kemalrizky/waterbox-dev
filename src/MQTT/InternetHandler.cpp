@@ -1,9 +1,6 @@
 #include "InternetHandler.h"
 
-const char *wifiSsid = WIFI_SSID;
-const char *wifiPass = WIFI_PASS;
-
-void InternetHandler::wifiSetup() {
+void InternetHandler::init() {
     WiFi.mode(WIFI_STA);
 }
 
@@ -17,22 +14,22 @@ bool InternetHandler::isConnected() {
 }
 
 bool InternetHandler::connect() {
-    Serial.println("\nConnecting to WiFi...");
+    SERIAL_PRINTLN("\nConnecting to WiFi...");
     
     if (isConnected()) {
         WiFi.disconnect();
     }
     
-    WiFi.begin(wifiSsid, wifiPass);
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
 
     if (!isConnected()) {
-        Serial.println("\nWiFi connection failed");
+        SERIAL_PRINTLN("\nWiFi connection failed");
         return false;
     }
     else {
-        Serial.println("\nWiFi connected");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
+        SERIAL_PRINTLN("\nWiFi connected");
+        SERIAL_PRINT("IP address: ");
+        SERIAL_PRINTLN(WiFi.localIP());
         return true;
     }
     

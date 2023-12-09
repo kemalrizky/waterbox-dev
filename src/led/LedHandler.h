@@ -1,6 +1,7 @@
-#pragma once
+#ifndef LED_HANDLER_H
+#define LED_HANDLER_H
 
-#include "Global.h"
+#include "global.h"
 
 #define POWER_LED_PINOUT 17
 #define CONNECTION_LED_PINOUT 18
@@ -16,3 +17,5 @@ class LedHandler {
     private:
      unsigned long lastOn;
 };
+
+#endif

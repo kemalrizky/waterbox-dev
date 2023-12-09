@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TIME_HANDLER_H
+#define TIME_HANDLER_H
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
@@ -21,3 +22,5 @@ class TimeHandler {
      int timeZone;
 
 };
+
+#endif

@@ -1,9 +1,9 @@
-#include "Global.h"
-#include "MQTT\InternetHandler.h"
-#include "MQTT\MqttHandler.h"
-#include "OTA\OtaHandler.h"
-#include "Sensor\SensorHandler.h"
-#include "Misc\LedHandler.h"
+#include "global.h"
+#include "mqtt/InternetHandler.h"
+#include "mqtt/MqttHandler.h"
+#include "ota/OtaHandler.h"
+#include "waterflowsensor/SensorHandler.h"
+#include "led/LedHandler.h"
 
 InternetHandler internetHandler;
 MqttHandler mqttHandler;
@@ -15,7 +15,7 @@ void setup() {
   Serial.begin(115200);
   ledHandler.setup();
   ledHandler.turnOn(POWER_LED_PINOUT);
-  internetHandler.wifiSetup();
+  internetHandler.init();
   internetHandler.connect();
   mqttHandler.setup();
   otaHandler.initServer();

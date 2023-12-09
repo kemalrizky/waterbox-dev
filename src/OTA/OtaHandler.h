@@ -1,6 +1,7 @@
-#pragma once
+#ifndef OTA_HANDLER_H
+#define OTA_HANDLER_H
 
-#include "Global.h"
+#include "global.h"
 #include <WebServer.h>
 #include <ESP2SOTA.h>
 
@@ -13,3 +14,5 @@ class OtaHandler {
      WebServer *server = nullptr;
      bool isServerInitialized();
 };
+
+#endif

@@ -1,9 +1,12 @@
-#pragma once
+#ifndef MQTT_HANDLER_H
+#define MQTT_HANDLER_H
 
-#include "Global.h"
-#include "credentials.h"
+#include "global.h"
 #include <PubSubClient.h>
 #include <WiFi.h>
+
+// MQTT Server
+#define MQTT_SERVER "161.97.179.79"
 
 class MqttHandler{
     public:
@@ -20,5 +23,7 @@ class MqttHandler{
 };
 
 void callback(char *, byte *, unsigned int);
+
+#endif
 
 

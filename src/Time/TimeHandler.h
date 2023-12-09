@@ -4,7 +4,6 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-
 class TimeHandler {
     public:
      void init();

@@ -1,4 +1,5 @@
 #include "LedHandler.h"
+#include "global.h"
 
 void LedHandler::setup() {
     pinMode(POWER_LED_PINOUT, OUTPUT);

@@ -1,8 +1,6 @@
 #ifndef LED_HANDLER_H
 #define LED_HANDLER_H
 
-#include "global.h"
-
 #define POWER_LED_PINOUT 17
 #define CONNECTION_LED_PINOUT 18
 #define DATA_LED_PINOUT 19

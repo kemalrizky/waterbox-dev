@@ -1,15 +1,22 @@
 #ifndef INTERNET_HANDLER_H
 #define INTERNET_HANDLER_H
 
-#include "global.h"
 #include "wifi_credentials.h"
 #include <WiFi.h>
+
+enum InternetStatusCode {
+    DISCONNECTED = 0,
+    CONNECTED,
+};
 
 class InternetHandler{
     public:
      void init();
-     bool connect();
-     bool isConnected();
+     InternetStatusCode connect();
+     InternetStatusCode checkConnection();
+
+    private:
+     InternetStatusCode internetStatus;
 };
 
 #endif

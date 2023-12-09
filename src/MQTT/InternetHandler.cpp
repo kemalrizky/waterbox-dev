@@ -1,36 +1,32 @@
 #include "InternetHandler.h"
+#include "global.h"
 
 void InternetHandler::init() {
     WiFi.mode(WIFI_STA);
 }
 
-bool InternetHandler::isConnected() {
+InternetStatusCode InternetHandler::checkConnection() {
     if (WiFi.status() == WL_CONNECTED) {
-        return true;
+        return internetStatus = CONNECTED;
     }
     else {
-        return false;
+        return internetStatus = DISCONNECTED;
     }
 }
 
-bool InternetHandler::connect() {
-    SERIAL_PRINTLN("\nConnecting to WiFi...");
-    
-    if (isConnected()) {
-        WiFi.disconnect();
-    }
-    
+InternetStatusCode InternetHandler::connect() {
+    Serial.println("\nConnecting to WiFi...");
+    WiFi.disconnect();
     WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-    if (!isConnected()) {
-        SERIAL_PRINTLN("\nWiFi connection failed");
-        return false;
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("\nWiFi connection failed");
+        return internetStatus = CONNECTED;
     }
     else {
-        SERIAL_PRINTLN("\nWiFi connected");
-        SERIAL_PRINT("IP address: ");
-        SERIAL_PRINTLN(WiFi.localIP());
-        return true;
-    }
-    
+        Serial.println("\nWiFi connected");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return internetStatus = DISCONNECTED;
+    } 
 }

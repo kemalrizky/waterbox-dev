@@ -15,7 +15,9 @@ class SensorHandler {
      SensorHandler();
      void init();
      void setCalibrationFactor(float);
-     void readData(WaterFlowData *);
+     void updateData(WaterFlowData *);
+
+     bool dataSent = false;
 
     private:
      static SensorHandler* pSensorHandler;

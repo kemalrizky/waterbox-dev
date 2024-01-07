@@ -21,14 +21,16 @@ void SensorHandler::setCalibrationFactor(float _calibrationFactor) {
     calibrationFactor = _calibrationFactor;
 }
 
-void SensorHandler::readData(WaterFlowData *s_waterflowdata) {
+void SensorHandler::updateData(WaterFlowData *s_waterflowdata) {
     noInterrupts();
     byte pulse_per_sec = pulseCount;
     pulseCount = 0;
     // Get Flowrate
     float _flowRate = float(pulse_per_sec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
     s_waterflowdata->flowRate = _flowRate;
-    s_waterflowdata->totalVolume += _flowRate;
+    s_waterflowdata->totalVolume += _flowRate; // ROY: rate kenapa langsung ditambahkan ke volume? cc @kemalrzky
+
+    dataSent = false;
 
     interrupts();
 }

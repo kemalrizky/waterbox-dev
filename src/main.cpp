@@ -44,7 +44,7 @@ void loop() {
       if(!wfd.isPublished) {
         if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", wfd.flowRate) && 
             mqttHandler.publish("waterbox/W0002/flow_sensor/volume", wfd.totalVolume)) {
-          wfd.totalVolume = 0; // volume reset
+          wfd.totalVolume = 0; // volume reset after successful publish
           ledHandler.blink(DATA_LED_PINOUT);
           wfd.isPublished = true;
           sensorHandler.lastPublish = millis();

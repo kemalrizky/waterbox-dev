@@ -24,7 +24,7 @@ void SensorHandler::setCalibrationFactor(float _calibrationFactor) {
 void SensorHandler::updateData(WaterFlowData *s_waterflowdata) {
     noInterrupts();
     byte pulse_per_sec = pulseCount;
-    pulseCount = 0; // pulse reset
+    pulseCount = 0; // pulse reset after successfully acquired
     
     // Get Flowrate
     float _flowRate = float(pulse_per_sec) * calibrationFactor;   // uncomment for flowrate measurement in L/s

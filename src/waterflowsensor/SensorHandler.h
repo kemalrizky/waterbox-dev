@@ -8,6 +8,7 @@
 struct WaterFlowData {
     float flowRate;
     float totalVolume;
+    bool isPublished;
 };
 
 class SensorHandler {
@@ -16,8 +17,6 @@ class SensorHandler {
      void init();
      void setCalibrationFactor(float);
      void updateData(WaterFlowData *);
-
-     bool dataSent = false;
 
     private:
      static SensorHandler* pSensorHandler;

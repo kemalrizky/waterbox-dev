@@ -28,9 +28,8 @@ void SensorHandler::updateData(WaterFlowData *s_waterflowdata) {
     // Get Flowrate
     float _flowRate = float(pulse_per_sec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
     s_waterflowdata->flowRate = _flowRate;
-    s_waterflowdata->totalVolume += _flowRate; // ROY: rate kenapa langsung ditambahkan ke volume? cc @kemalrzky
-
-    dataSent = false;
+    s_waterflowdata->totalVolume += _flowRate; // langsung ditambahkan ke volume dengan asumsi ini sudah per detik, jadi langsung dalam L saja
+    s_waterflowdata->isPublished = false;
 
     interrupts();
 }

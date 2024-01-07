@@ -46,11 +46,11 @@ void loop() {
     }                   
   } else {
   // send data
-    if(!sensorHandler.dataSent) {
+    if(!wfd.isPublished) {
       if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", wfd.flowRate) && 
           mqttHandler.publish("waterbox/W0002/flow_sensor/volume", wfd.totalVolume)) {
         ledHandler.blink(DATA_LED_PINOUT);
-        sensorHandler.dataSent = true;
+        wfd.isPublished = true;
       }
     }
   }

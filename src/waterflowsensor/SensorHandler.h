@@ -18,6 +18,12 @@ class SensorHandler {
      void setCalibrationFactor(float);
      void updateData(WaterFlowData *);
 
+     long lastRead = 0;
+     long readInterval = 1000;
+
+     long lastPublish = 0;
+     long publishInterval = 30000;
+
     private:
      static SensorHandler* pSensorHandler;
      static void IRAM_ATTR onInterrupt();

@@ -20,6 +20,13 @@
     - OtaHandler
     - LedHandler
 
+## Datalogger Class
+```
+- createFile: "publishQueue.txt", "errorLog.txt"
+    - file management: readAll, readLine, appendLine, deleteLine, deleteAllLines (debug)
+- listDir
+```
+
 ![](docs/component-diagram.png)
 
 ## WaterflowData Sequence Flow

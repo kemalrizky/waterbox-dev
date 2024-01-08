@@ -12,7 +12,7 @@ MqttHandler mqttHandler;
 OtaHandler otaHandler;
 
 SensorHandler sensorHandler;
-WaterFlowData wfd;
+WaterflowData wfd;
 
 void mqttReconnectTask(void *);
 

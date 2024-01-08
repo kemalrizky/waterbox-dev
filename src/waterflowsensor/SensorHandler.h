@@ -5,7 +5,7 @@
 
 #define FLOW_SENSOR 15
 
-struct WaterFlowData {
+struct WaterflowData {
     float flowRate;
     float totalVolume;
     bool isPublished;
@@ -16,7 +16,7 @@ class SensorHandler {
      SensorHandler();
      void init();
      void setCalibrationFactor(float);
-     void updateData(WaterFlowData *);
+     void updateData(WaterflowData *);
 
      long lastRead = 0;
      long readInterval = 1000;

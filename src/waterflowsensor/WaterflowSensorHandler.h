@@ -25,6 +25,9 @@ class WaterflowSensorHandler {
      waterflowData_t getData();
      void popData();
 
+     void dummyPulse();
+     static void dummyPulseTask(void *);
+
      long lastReadVolume = 0;
      long readVolumeInterval = 1000;
 

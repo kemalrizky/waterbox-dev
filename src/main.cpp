@@ -17,7 +17,6 @@ WaterflowSensorHandler waterflowSensorHandler;
 
 DataLogger dataLogger;
 
-void mqttReconnectTask(void *);
 void publishTask(void *);
 void flushTask(void *);
 
@@ -31,9 +30,11 @@ void setup() {
   mqttHandler.setup();
   otaHandler.init();
 
-  xTaskCreate(mqttReconnectTask, "mqttReconnectTask", 1024 * 1, NULL, 3, NULL);
+  xTaskCreate(mqttHandler.reconnectTask, "mqttReconnectTask", 1024 * 1, &mqttHandler, 3, NULL);
   xTaskCreate(publishTask, "publishTask", 1024 * 2, NULL, 1, NULL);
   // xTaskCreate(flushTask, "flushTask", 1024 * 1, NULL, 1, NULL);
+
+  xTaskCreate(waterflowSensorHandler.dummyPulseTask, "dummyPulseTask", 1024 * 1, &waterflowSensorHandler, 1, NULL);
 
   waterflowSensorHandler.init();
   waterflowSensorHandler.setCalibrationFactor(0.117);
@@ -53,30 +54,6 @@ void loop() {
 
   mqttHandler.loop();
   otaHandler.handleRequest();
-}
-
-void mqttReconnectTask(void * pv) {
-  while(1) {
-    // Mantaining mqtt connection
-    if(!mqttHandler.isConnected()) {              
-      ledHandler.turnOff(CONNECTION_LED_PINOUT);
-
-      if(internetHandler.checkConnection() == InternetStatusCode::DISCONNECTED) {
-        if(internetHandler.connect()) {
-          if(mqttHandler.connect()) {
-            ledHandler.turnOn(CONNECTION_LED_PINOUT);
-          }
-        }                
-      }
-      else {
-        if(mqttHandler.connect()) {
-          ledHandler.turnOn(CONNECTION_LED_PINOUT);
-        }
-      }                   
-    }
-
-    vTaskDelay(1000); 
-  }
 }
 
 void publishTask(void * pv) {  

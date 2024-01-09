@@ -77,3 +77,15 @@ void WaterflowSensorHandler::popData() {
     publishQueue.pop();
 }
 
+void WaterflowSensorHandler::dummyPulse() {
+    pulseCount_++;
+}
+
+void WaterflowSensorHandler::dummyPulseTask(void * pv) {
+    WaterflowSensorHandler * waterflowSensorHandler = (WaterflowSensorHandler *) pv;
+    
+    while(1) {
+        if (random(300) < 250) waterflowSensorHandler->dummyPulse();
+        vTaskDelay(100);
+    }
+}

@@ -32,15 +32,20 @@
         - calls `configTime` in XX day intervals (default is never called again after called once in init)
 - loop
     - `WaterflowSensor` object returns flowrate & volume
-        - ticks every 1 sec, add up volume, tick resets to 0
+        - `pulseCount` adds up by every interupt from flowsensor
     - `SensorHandler` temporary data holder 
-        - acquires new data every 30 mins --> fills WaterflowData struct, acquire timestamp from `TimeHandler`
-        - store data to `SensorHandler` publishQueue before mqtt publish, reset volume to 0
-        - if failed after publishQueue MAX_SIZE, write all to `Datalogger` to be flushed sometime later
-        - check internet, mqtt publish (volume reset)
+        - updateVolume called every 1 sec, get flowrate (pulse_per_sec * callibration factor), add to totalVolume, add to totalPulseCount, reset pulseCount to 0
+        - updateData called every 1 min, get avgFlowrate (divide totalPulseCount with time elapsed (60)), then reset totalPulseCount to 0
+            - fills WaterflowData struct, acquire timestamp from `TimeHandler`
+        - push data to `SensorHandler.publishQueue`, empty waterflowData, expected to be published right away by a seperate entitiy
+        - if publishQueue.size() > MAX_SIZE, write all to `Datalogger` `flushQueue.txt` to be flushed sometime later
+        - check internet, mqtt publish by `dataPublisherTask`
     - `Datalogger` permanent data holder (until explicitly deleted) 
         - delete when successful mqtt publish (flag as isPublished). retain at least 1 latest data for next `TimeHandler` check when esp just turned on, and doing `TimeHandler` calibration from ntp 
         - after internet reconnect and WaterflowData in Datalogger not empty, flush (mqtt publish) as seperate task until empty
+
+## Flush Sequence Flow
+- TBD
 
 ## Datalogger Class
 ```

@@ -20,13 +20,6 @@
     - OtaHandler
     - LedHandler
 
-## Datalogger Class
-```
-- createFile: "publishQueue.txt", "errorLog.txt"
-    - file management: readAll, readLine, appendLine, deleteLine, deleteAllLines (debug)
-- listDir
-```
-
 ![](docs/component-diagram.png)
 
 ## WaterflowData Sequence Flow
@@ -42,13 +35,21 @@
         - ticks every 1 sec, add up volume, tick resets to 0
     - `SensorHandler` temporary data holder 
         - acquires new data every 30 mins --> fills WaterflowData struct, acquire timestamp from `TimeHandler`
-        - write to `Datalogger` before mqtt publish, reset volume to 0
+        - store data to `SensorHandler` publishQueue before mqtt publish, reset volume to 0
+        - if failed after publishQueue MAX_SIZE, write all to `Datalogger` to be flushed sometime later
         - check internet, mqtt publish (volume reset)
     - `Datalogger` permanent data holder (until explicitly deleted) 
         - delete when successful mqtt publish (flag as isPublished). retain at least 1 latest data for next `TimeHandler` check when esp just turned on, and doing `TimeHandler` calibration from ntp 
         - after internet reconnect and WaterflowData in Datalogger not empty, flush (mqtt publish) as seperate task until empty
 
-## Data Format
+## Datalogger Class
+```
+- createFile: "publishQueue.txt", "errorLog.txt"
+    - file management: readAll, readLine, appendLine, deleteLine, deleteAllLines (debug)
+- listDir
+```
+
+## Log Data Format
 - WaterflowData format:
 ```
 struct WaterflowData {
@@ -82,14 +83,14 @@ ts:<timestamp>,ispub:<isPublished>,fr:<flowRate>,vol:<volume>;
 
 ## To Do:
 - [x] refactor current code to run with basic function
-- [ ] add internal/programatical TimeHandler
+- [ ] refactor internal/programatical TimeHandler
     - [x] create sample project: [esp-rtc-ntp](https://github.com/royyandzakiy/esp32-rtc-ntp)
     - [ ] redo TimeHandler using configTime to make more simple
     - [ ] do mandatory calibration to sever or ntp server when init; give option to do interval based calibration (default is never)
-- [ ] local storage using SPIFFs to store unsent data
+- [ ] add local storage using LITTLEFS to store unsent data
     - [ ] create sample project: TBD
     - [ ] having historical record of unsent data, including timestamp. create a temporary data queue
     - [ ] adding timestamp to each datapoint to be sent
     - [ ] after reconnection, will do flushing immidiately
     - [ ] retains last 5 datapoints for error checking purpose
-- [ ] has an error log stored in spiffs
+- [ ] has an error log stored in LITTLEFS

@@ -4,27 +4,27 @@ void DataLogger::init() {
     fileHandler.init();
 
     // check if files exists
-    if (!fileHandler.fileExists("/publishQueue.txt")) {
+    if (!fileHandler.fileExists("/flushQueue.txt")) {
         // if not, create files
-        fileHandler.writeFile("/publishQueue.txt", "");
+        fileHandler.writeFile("/flushQueue.txt", "");
         fileHandler.writeFile("/errorLog.txt", "");
     }
 
     fileHandler.listDir("/", 3);
 }
 
-// ------------ publishQueue.txt ------------ 
+// ------------ flushQueue.txt ------------ 
 
 String DataLogger::flushQueueGetAll() {
-    return fileHandler.readFile("/publishQueue.txt");
+    return fileHandler.readFile("/flushQueue.txt");
 }
 
 String DataLogger::flushQueueGetLine() {
-    return fileHandler.readLine("/publishQueue.txt");
+    return fileHandler.readLine("/flushQueue.txt");
 }
 
 void DataLogger::flushQueueAppendLine(const char * message) {
-    fileHandler.appendFile("/publishQueue.txt", String(message).c_str());
+    fileHandler.appendFile("/flushQueue.txt", String(message).c_str());
 }
 
 // void DataLogger::publishQueueDeleteLine() {
@@ -32,7 +32,7 @@ void DataLogger::flushQueueAppendLine(const char * message) {
 // }
 
 void DataLogger::flushQueueClearFile() {
-    fileHandler.writeFile("/publishQueue.txt", "");
+    fileHandler.writeFile("/flushQueue.txt", "");
 }
 
 // ------------ errorLog.txt ------------ 

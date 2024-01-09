@@ -67,7 +67,7 @@ String FileHandler::readLine(const char * path){
     File file = LITTLEFS.open(path);
     if(!file || file.isDirectory()){
         Serial.println("- failed to open file for reading");
-        return;
+        return "";
     }
 
     Serial.println("- read line from file:");
@@ -86,7 +86,7 @@ String FileHandler::readFile(const char * path){
     File file = LITTLEFS.open(path);
     if(!file || file.isDirectory()){
         Serial.println("- failed to open file for reading");
-        return;
+        return "";
     }
 
     Serial.println("- read from file:");

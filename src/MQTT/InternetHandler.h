@@ -19,4 +19,6 @@ class InternetHandler{
      InternetStatusCode internetStatus;
 };
 
+extern InternetHandler internetHandler;
+
 #endif

@@ -16,4 +16,6 @@ class LedHandler {
      unsigned long lastOn;
 };
 
+extern LedHandler ledHandler;
+
 #endif

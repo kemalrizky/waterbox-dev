@@ -4,6 +4,8 @@
 #include "global.h"
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include "../led/LedHandler.h"
+#include "InternetHandler.h"
 
 // MQTT Server
 #define MQTT_SERVER "161.97.179.79"
@@ -16,6 +18,8 @@ class MqttHandler{
      void subscribe(String);
      void loop();
      bool isConnected();
+
+     static void reconnectTask(void *);
     
     private:
      WiFiClient wifiClient;

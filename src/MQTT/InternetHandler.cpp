@@ -1,8 +1,21 @@
 #include "InternetHandler.h"
 #include "global.h"
 
-void InternetHandler::init() {
+InternetStatusCode InternetHandler::init() {
     WiFi.mode(WIFI_STA);
+    Serial.println("\nConnecting to WiFi...");
+    WiFi.begin(wifi_ssid, wifi_pass);
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("\nWiFi connection failed");
+        return internetStatus = DISCONNECTED;
+    }
+    else {
+        Serial.print("\n Connected to");
+        Serial.println(wifi_ssid);
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+        return internetStatus = CONNECTED;
+    } 
 }
 
 InternetStatusCode InternetHandler::checkConnection() {
@@ -15,18 +28,20 @@ InternetStatusCode InternetHandler::checkConnection() {
 }
 
 InternetStatusCode InternetHandler::connect() {
+    
     Serial.println("\nConnecting to WiFi...");
     WiFi.disconnect();
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    WiFi.begin(wifi_ssid, wifi_pass);
 
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("\nWiFi connection failed");
-        return internetStatus = CONNECTED;
+        return internetStatus = DISCONNECTED;
     }
     else {
-        Serial.println("\nWiFi connected");
+        Serial.print("\n Connected to");
+        Serial.println(wifi_ssid);
         Serial.print("IP address: ");
         Serial.println(WiFi.localIP());
-        return internetStatus = DISCONNECTED;
+        return internetStatus = CONNECTED;
     } 
 }

@@ -11,12 +11,14 @@ enum InternetStatusCode {
 
 class InternetHandler{
     public:
-     void init();
+     InternetStatusCode init();
      InternetStatusCode connect();
      InternetStatusCode checkConnection();
 
     private:
      InternetStatusCode internetStatus;
+     const char *wifi_ssid = WIFI_SSID;
+     const char *wifi_pass = WIFI_PASS;
 };
 
 #endif

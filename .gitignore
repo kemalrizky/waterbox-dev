@@ -3,4 +3,4 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-.src/mqtt/wifi_credentials.h
+.src/MQTT/wifi_credentials.h

@@ -78,7 +78,9 @@ waterflowData_t WaterflowSensorHandler::getData() {
     return publishQueue.front();
 }
 
-void WaterflowSensorHandler::popData() {
+void WaterflowSensorHandler::dequeueData() {
+    // add mutex for safety of multiple data access
+    // ...
     publishQueue.pop();
 }
 

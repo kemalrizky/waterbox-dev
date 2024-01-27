@@ -23,7 +23,7 @@ class WaterflowSensorHandler {
 
      bool isEmpty();
      waterflowData_t getData();
-     void popData();
+     void dequeueData();
 
      void dummyPulse();
      static void dummyPulseTask(void *);

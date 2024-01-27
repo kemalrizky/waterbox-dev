@@ -24,7 +24,7 @@ void MqttHandler::setup() {
 bool MqttHandler::connect() {
   Serial.print("Attempting MQTT connection...");
 
-  if (mqttClient.connect("W0201918")) {
+  if (mqttClient.connect(deviceIdGenerator.getId().c_str())) {
     Serial.println(" connected");
     // resubscribe to all topics
     // ...
@@ -44,7 +44,10 @@ void MqttHandler::subscribe(String _topic) {
 
 void MqttHandler::loop() { mqttClient.loop(); }
 
-bool MqttHandler::publish(String _topic, float _data) {
+bool MqttHandler::publish(String _measurement, float _data) {
+  String _topic = "waterbox/" + deviceIdGenerator.getId() + "/" + _measurement;
+  
+  // Convert float to string
   char _payload[7];  // max 999.99
   dtostrf(_data, 3, 2, _payload);
 

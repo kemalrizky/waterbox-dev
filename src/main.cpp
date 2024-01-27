@@ -43,12 +43,12 @@ void setup() {
 void loop() {
   // update sensor data
   if (millis() - waterflowSensorHandler.lastReadVolume > waterflowSensorHandler.readVolumeInterval) {
-    waterflowSensorHandler.updateVolume();
+    waterflowSensorHandler.updateVolumePerSec();
     waterflowSensorHandler.lastReadVolume = millis();
   }
   
   if (millis() - waterflowSensorHandler.lastReadFlow > waterflowSensorHandler.readFlowInterval) {
-    waterflowSensorHandler.updateData();
+    waterflowSensorHandler.updateQueuePerMin();
     waterflowSensorHandler.lastReadFlow = millis();
   }
 
@@ -67,6 +67,7 @@ void publishTask(void * pv) {
         while(!waterflowSensorHandler.isEmpty()) {
           if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", waterflowSensorHandler.getData().flowRate) && 
               mqttHandler.publish("waterbox/W0002/flow_sensor/volume", waterflowSensorHandler.getData().totalVolume)) {
+            // removed successfully published data from waterflowSensorHandler.publishQueue
             waterflowSensorHandler.popData();
 
             ledHandler.blink(DATA_LED_PINOUT);

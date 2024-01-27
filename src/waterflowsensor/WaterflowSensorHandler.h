@@ -18,8 +18,8 @@ class WaterflowSensorHandler {
      WaterflowSensorHandler();
      void init();
      void setCalibrationFactor(float);
-     void updateVolume();
-     void updateData();
+     void updateVolumePerSec();
+     void updateQueuePerMin();
 
      bool isEmpty();
      waterflowData_t getData();
@@ -40,8 +40,8 @@ class WaterflowSensorHandler {
 
      std::queue<waterflowData_t> publishQueue;
      waterflowData_t waterflowData_;
-     volatile unsigned int pulseCount_;
-     volatile unsigned int totalPulseCount_;
+     volatile unsigned int pulseTick_;
+     volatile unsigned int pulsePerMin_;
 
      float calibrationFactor;
 };

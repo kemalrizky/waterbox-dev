@@ -9,7 +9,7 @@ WaterflowSensorHandler::WaterflowSensorHandler() : calibrationFactor(1.0) {
 
 void IRAM_ATTR WaterflowSensorHandler::onInterrupt() {
     if (pSensorHandler != nullptr) {
-        pSensorHandler->pulseCount_++;
+        pSensorHandler->pulseTick_++;
     }
 }
 
@@ -21,27 +21,27 @@ void WaterflowSensorHandler::setCalibrationFactor(float _calibrationFactor) {
     calibrationFactor = _calibrationFactor;
 }
 
-void WaterflowSensorHandler::updateVolume() {
+void WaterflowSensorHandler::updateVolumePerSec() {
     noInterrupts();
-    totalPulseCount_ += pulseCount_;
-    byte pulse_per_sec = pulseCount_;
-    pulseCount_ = 0; // pulse reset after successfully acquired
+    pulsePerMin_ += pulseTick_;
+    uint32_t _pulsePerSec = pulseTick_;
+    pulseTick_ = 0; // pulseTick_ reset after successfully acquired
     
     // Get Flowrate
-    float volume_per_sec = float(pulse_per_sec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
+    float _volumePerSec = float(_pulsePerSec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
 
-    waterflowData_.totalVolume += volume_per_sec; // langsung ditambahkan ke volume dengan asumsi ini sudah per detik, jadi langsung dalam L saja
+    waterflowData_.totalVolume += _volumePerSec; // langsung ditambahkan ke volume dengan asumsi ini sudah per detik, jadi langsung dalam L saja
 
     interrupts();
 }
 
-void WaterflowSensorHandler::updateData() {
+void WaterflowSensorHandler::updateQueuePerMin() {
     noInterrupts();
-    byte pulse_per_min = totalPulseCount_;
-    totalPulseCount_ = 0; // pulse reset after successfully acquired
+    uint32_t _pulsePerMin = pulsePerMin_;
+    pulsePerMin_ = 0; // pulsePerMin_ reset after successfully acquired
     
     // Get Flowrate
-    float _avgFlowRate = float(pulse_per_min) * calibrationFactor;
+    float _avgFlowRate = float(_pulsePerMin) * calibrationFactor;
     waterflowData_.flowRate = _avgFlowRate;
     waterflowData_.timestamp = 0; // implement timestamp here
     interrupts();
@@ -54,14 +54,18 @@ void WaterflowSensorHandler::updateData() {
     waterflowData_.totalVolume = 0.0;
 
     if (publishQueue.size() > PUBLISH_QUEUE_MAX_SIZE) {
-        Serial.println("publishQueue.size MAX, move to flushQueue.txt");
-        // move publish queue into DataLogger flushQueue.txt
-        // ...
+        // discard data
+        Serial.println("publishQueue.size MAX, data discarded");
+        // give log that publishQueue.size maxed out
 
-        // delete all contents from publishQueue
-        while(!publishQueue.empty()) {
-            publishQueue.pop();
-        }
+        // // alternative: move data to flushQueue.txt, then delete all contents from publishQueue
+        // Serial.println("publishQueue.size MAX, move to flushQueue.txt");
+        // // move contents of publishQueue into DataLogger to fill in flushQueue.txt
+        // // ...
+
+        // while(!publishQueue.empty()) {
+        //     publishQueue.pop();
+        // }
     }
 }
 
@@ -78,7 +82,7 @@ void WaterflowSensorHandler::popData() {
 }
 
 void WaterflowSensorHandler::dummyPulse() {
-    pulseCount_++;
+    pulseTick_++;
 }
 
 void WaterflowSensorHandler::dummyPulseTask(void * pv) {

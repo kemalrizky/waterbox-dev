@@ -1,11 +1,12 @@
 #ifndef MQTT_HANDLER_H
 #define MQTT_HANDLER_H
 
-#include "global.h"
+#include "Global.h"
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include "../led/LedHandler.h"
 #include "InternetHandler.h"
+#include "DeviceIdGenerator.h"
 
 class MqttHandler{
     public:

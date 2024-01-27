@@ -1,7 +1,7 @@
 #ifndef INTERNET_HANDLER_H
 #define INTERNET_HANDLER_H
 
-#include "wifi_credentials.h"
+#include "credentials.h"
 #include <WiFi.h>
 
 enum InternetStatusCode {

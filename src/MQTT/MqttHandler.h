@@ -7,9 +7,6 @@
 #include "../led/LedHandler.h"
 #include "InternetHandler.h"
 
-// MQTT Server
-#define MQTT_SERVER "161.97.179.79"
-
 class MqttHandler{
     public:
      void setup();

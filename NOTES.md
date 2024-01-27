@@ -34,8 +34,8 @@
     - `WaterflowSensor` object returns flowrate & volume
         - `pulseCount` adds up by every interupt from flowsensor
     - `SensorHandler` temporary data holder 
-        - updateVolume called every 1 sec, get flowrate (pulse_per_sec * callibration factor), add to totalVolume, add to totalPulseCount, reset pulseCount to 0
-        - updateData called every 1 min, get avgFlowrate (divide totalPulseCount with time elapsed (60)), then reset totalPulseCount to 0
+        - updateVolumePerSec called every 1 sec, get flowrate (pulse_per_sec * callibration factor), add to totalVolume, add to totalPulseCount, reset pulseCount to 0
+        - updateQueuePerMin called every 1 min, get avgFlowrate (divide totalPulseCount with time elapsed (60)), then reset totalPulseCount to 0
             - fills WaterflowData struct with `totalVolume` and `avgFlowrate`, acquire timestamp from `TimeHandler`
         - push data to `SensorHandler.publishQueue`, empty waterflowData, expected to be published right away by a seperate entitiy
         - if publishQueue.size() > MAX_SIZE, write all to `Datalogger` `flushQueue.txt` to be flushed sometime later

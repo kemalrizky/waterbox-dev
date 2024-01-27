@@ -67,14 +67,15 @@ void publishTask(void * pv) {
         while(!waterflowSensorHandler.isEmpty()) {
           if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", waterflowSensorHandler.getData().flowRate) && 
               mqttHandler.publish("waterbox/W0002/flow_sensor/volume", waterflowSensorHandler.getData().totalVolume)) {
-            // removed successfully published data from waterflowSensorHandler.publishQueue
-            waterflowSensorHandler.popData();
+            waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
 
             ledHandler.blink(DATA_LED_PINOUT);
           }
 
           vTaskDelay(1000);
         }
+      } else {
+        // log that mqtt not connected
       }
     }
     vTaskDelay(1000);

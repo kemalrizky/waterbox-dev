@@ -22,10 +22,10 @@ void MqttHandler::setup() {
 }
 
 bool MqttHandler::connect() {
-  Serial.print("\nAttempting MQTT connection...");
+  Serial.print("Attempting MQTT connection...");
 
   if (mqttClient.connect("W0201918")) {
-    Serial.println("connected");
+    Serial.println(" connected");
     // resubscribe to all topics
     // ...
 
@@ -49,7 +49,7 @@ bool MqttHandler::publish(String _topic, float _data) {
   dtostrf(_data, 3, 2, _payload);
 
   if (mqttClient.publish(_topic.c_str(), _payload)) {
-    Serial.println("\nData published.");
+    Serial.println("Data published.");
     return true;
   } else {
     Serial.print("failed to publish, rc=");
@@ -60,10 +60,10 @@ bool MqttHandler::publish(String _topic, float _data) {
 
 bool MqttHandler::isConnected() {
   if (!mqttClient.connected()) {
-    Serial.println("Not connected to MQTT broker");
+    // Serial.println("Not connected to MQTT broker");
     return false;
   } else {
-    Serial.println("Connected to MQTT broker");
+    // Serial.println("Connected to MQTT broker");
     return true;
   }
 }
@@ -102,6 +102,6 @@ void MqttHandler::reconnectTask(void* pv) {
       }
     }
 
-    vTaskDelay(1000);
+    vTaskDelay(10000);
   }
 }

@@ -1,5 +1,5 @@
 #include "InternetHandler.h"
-#include "global.h"
+#include "Global.h"
 
 void InternetHandler::init() {
     WiFi.mode(WIFI_STA);

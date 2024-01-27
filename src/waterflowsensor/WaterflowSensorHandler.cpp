@@ -1,5 +1,5 @@
 #include "WaterflowSensorHandler.h"
-#include "global.h"
+#include "Global.h"
 
 WaterflowSensorHandler* WaterflowSensorHandler::pSensorHandler = nullptr; // Initialize the static pointer
 

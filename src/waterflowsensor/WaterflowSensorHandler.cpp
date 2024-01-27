@@ -36,6 +36,7 @@ void WaterflowSensorHandler::updateVolumePerSec() {
 }
 
 void WaterflowSensorHandler::updateQueuePerMin() {
+    // assumption: flow rate can only be determined after 1 minute of captured flow pulse/tick
     noInterrupts();
     uint32_t _pulsePerMin = pulsePerMin_;
     pulsePerMin_ = 0; // pulsePerMin_ reset after successfully acquired
@@ -54,7 +55,7 @@ void WaterflowSensorHandler::updateQueuePerMin() {
     waterflowData_.totalVolume = 0.0;
 
     if (publishQueue.size() > PUBLISH_QUEUE_MAX_SIZE) {
-        // discard data
+        // discard data, in the assumption that normally queue will never reach MAX size
         Serial.println("publishQueue.size MAX, data discarded");
         // give log that publishQueue.size maxed out
 

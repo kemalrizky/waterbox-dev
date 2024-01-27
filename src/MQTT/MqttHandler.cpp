@@ -26,6 +26,9 @@ bool MqttHandler::connect() {
 
   if (mqttClient.connect("W0201918")) {
     Serial.println("connected");
+    // resubscribe to all topics
+    // ...
+
     return true;
   } else {
     Serial.print("failed, rc=");
@@ -76,13 +79,25 @@ void MqttHandler::reconnectTask(void* pv) {
       if (internetHandler.checkConnection() ==
           InternetStatusCode::DISCONNECTED) {
         if (internetHandler.connect()) {
+          vTaskDelay(1000);
           if (mqttHandler->connect()) {
+            vTaskDelay(1000);
             ledHandler.turnOn(CONNECTION_LED_PINOUT);
+          } else {
+            // log fail to connect to mqtt
+            // ...
           }
+        } else {
+          // log fail to connect to internet
+            // ...
         }
       } else {
         if (mqttHandler->connect()) {
+          vTaskDelay(1000);
           ledHandler.turnOn(CONNECTION_LED_PINOUT);
+        } else {
+          // log fail to connect to mqtt
+          // ...
         }
       }
     }

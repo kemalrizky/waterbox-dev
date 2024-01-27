@@ -1,13 +1,15 @@
-#include "global.h"
-#include "mqtt/InternetHandler.h"
-#include "mqtt/MqttHandler.h"
-#include "ota/OtaHandler.h"
+#include "Global.h"
+#include "DeviceIdGenerator.h"
+#include "MQTT/InternetHandler.h"
+#include "MQTT/MqttHandler.h"
+#include "OTA/OtaHandler.h"
 #include "waterflowsensor/WaterflowSensorHandler.h"
 #include "led/LedHandler.h"
 #include "DataLogger/FileHandler.h"
 #include "DataLogger/DataLogger.h"
 
 LedHandler ledHandler;
+DeviceIdGenerator deviceIdGenerator;
 
 InternetHandler internetHandler;
 MqttHandler mqttHandler;
@@ -22,6 +24,8 @@ void flushTask(void *);
 
 void setup() {
   Serial.begin(115200);
+
+  deviceIdGenerator.init();
 
   ledHandler.setup();
   ledHandler.turnOn(POWER_LED_PINOUT);
@@ -66,8 +70,8 @@ void publishTask(void * pv) {
     if (millis() - lastPublish > publishInterval) {
       if(mqttHandler.isConnected()) {
         while(!waterflowSensorHandler.isEmpty()) {
-          if(mqttHandler.publish("waterbox/W0002/flow_sensor/flowrate", waterflowSensorHandler.getData().flowRate) && 
-              mqttHandler.publish("waterbox/W0002/flow_sensor/volume", waterflowSensorHandler.getData().totalVolume)) {
+          if(mqttHandler.publish("flowrate", waterflowSensorHandler.getData().flowRate) && 
+              mqttHandler.publish("volume", waterflowSensorHandler.getData().totalVolume)) {
             waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
 
             ledHandler.blink(DATA_LED_PINOUT);

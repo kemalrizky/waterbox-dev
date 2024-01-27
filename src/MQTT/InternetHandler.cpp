@@ -15,18 +15,32 @@ InternetStatusCode InternetHandler::checkConnection() {
 }
 
 InternetStatusCode InternetHandler::connect() {
-    Serial.println("\nConnecting to WiFi...");
+    Serial.println("Connecting to WiFi...");
     WiFi.disconnect();
     WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-    if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("\nWiFi connection failed");
-        return internetStatus = CONNECTED;
+    // polling until successfully connected or timeout
+    long _timeout = millis() + 10000;
+    while (WiFi.status() != WL_CONNECTED && millis() < _timeout);
+
+    switch (WiFi.status()) {
+        case WL_DISCONNECTED:
+            Serial.println("WiFi disconnected");
+            return internetStatus = DISCONNECTED;
+            break;
+        case WL_NO_SSID_AVAIL:
+            Serial.println("Cannot connect to SSID: \"" + String(WIFI_SSID) + "\"");
+            return internetStatus = DISCONNECTED;
+            break;
+        case WL_CONNECTED:
+            Serial.println("WiFi connected");
+            Serial.print("IP address: ");
+            Serial.println(WiFi.localIP());
+            return internetStatus = CONNECTED;
+            break;
+        default:
+            Serial.println("WiFi cannot connect, error code = " + String(WiFi.status()));
+            return internetStatus = DISCONNECTED;
+            break;
     }
-    else {
-        Serial.println("\nWiFi connected");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        return internetStatus = DISCONNECTED;
-    } 
 }

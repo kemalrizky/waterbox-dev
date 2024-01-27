@@ -30,10 +30,11 @@ void setup() {
   mqttHandler.setup();
   otaHandler.init();
 
-  xTaskCreate(mqttHandler.reconnectTask, "mqttReconnectTask", 1024 * 1, &mqttHandler, 3, NULL);
+  xTaskCreate(mqttHandler.reconnectTask, "mqttReconnectTask", 1024 * 5, &mqttHandler, 3, NULL);
   xTaskCreate(publishTask, "publishTask", 1024 * 2, NULL, 1, NULL);
   // xTaskCreate(flushTask, "flushTask", 1024 * 1, NULL, 1, NULL);
 
+  // DUMMY WATERFLOW INTERRUPT FOR DEVELOPMENT PURPOSES
   xTaskCreate(waterflowSensorHandler.dummyPulseTask, "dummyPulseTask", 1024 * 1, &waterflowSensorHandler, 1, NULL);
 
   waterflowSensorHandler.init();

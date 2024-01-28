@@ -8,6 +8,7 @@
 #include "DataLogger/FileHandler.h"
 #include "DataLogger/DataLogger.h"
 
+TimeHandler timeHandler;
 LedHandler ledHandler;
 DeviceIdGenerator deviceIdGenerator;
 
@@ -38,8 +39,11 @@ void setup() {
   xTaskCreate(publishTask, "publishTask", 1024 * 2, NULL, 1, NULL);
   // xTaskCreate(flushTask, "flushTask", 1024 * 1, NULL, 1, NULL);
 
+  timeHandler.init();
+
   // DUMMY WATERFLOW INTERRUPT FOR DEVELOPMENT PURPOSES
   xTaskCreate(waterflowSensorHandler.dummyPulseTask, "dummyPulseTask", 1024 * 1, &waterflowSensorHandler, 1, NULL);
+
 
   waterflowSensorHandler.init();
   waterflowSensorHandler.setCalibrationFactor(0.117);
@@ -53,24 +57,27 @@ void loop() {
   }
   
   if (millis() - waterflowSensorHandler.lastReadFlow > waterflowSensorHandler.readFlowInterval) {
+    timeHandler.printLocalTime();
     waterflowSensorHandler.updateQueuePerMin();
     waterflowSensorHandler.lastReadFlow = millis();
   }
 
   mqttHandler.loop();
   otaHandler.handleRequest();
+
 }
 
 void publishTask(void * pv) {  
   long lastPublish = 0;
-  long publishInterval = 60000;
+  long publishInterval = PUBLISH_INTERVAL_MS;
 
   while(1) {
     // send data
     if (millis() - lastPublish > publishInterval) {
       if(mqttHandler.isConnected()) {
         while(!waterflowSensorHandler.isEmpty()) {
-          if(mqttHandler.publish("flowrate", waterflowSensorHandler.getData().flowRate) && 
+          if(mqttHandler.publish("timestamp", waterflowSensorHandler.getData().timestamp) && 
+              mqttHandler.publish("flowrate", waterflowSensorHandler.getData().flowRate) && 
               mqttHandler.publish("volume", waterflowSensorHandler.getData().totalVolume)) {
             waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
 

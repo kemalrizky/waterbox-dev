@@ -76,9 +76,7 @@ void publishTask(void * pv) {
     if (millis() - lastPublish > publishInterval) {
       if(mqttHandler.isConnected()) {
         while(!waterflowSensorHandler.isEmpty()) {
-          if(mqttHandler.publish("timestamp", waterflowSensorHandler.getData().timestamp) && 
-              mqttHandler.publish("flowrate", waterflowSensorHandler.getData().flowRate) && 
-              mqttHandler.publish("volume", waterflowSensorHandler.getData().totalVolume)) {
+          if(mqttHandler.publish(waterflowSensorHandler.getData())) {
             waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
 
             ledHandler.blink(DATA_LED_PINOUT);

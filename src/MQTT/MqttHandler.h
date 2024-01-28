@@ -7,13 +7,13 @@
 #include "../led/LedHandler.h"
 #include "InternetHandler.h"
 #include "DeviceIdGenerator.h"
+#include <ArduinoJson.h>
 
 class MqttHandler{
     public:
      void setup();
      bool connect();
-     bool publish(String, long);
-     bool publish(String, float);
+     bool publish(JsonDocument);
      void subscribe(String);
      void loop();
      bool isConnected();

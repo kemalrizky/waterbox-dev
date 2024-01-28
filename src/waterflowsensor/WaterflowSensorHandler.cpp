@@ -37,22 +37,28 @@ void WaterflowSensorHandler::updateVolumePerSec() {
 
 void WaterflowSensorHandler::updateQueuePerMin() {
     // assumption: flow rate can only be determined after 1 minute of captured flow pulse/tick
-    noInterrupts();
     uint32_t _pulsePerMin = pulsePerMin_;
     pulsePerMin_ = 0; // pulsePerMin_ reset after successfully acquired
     
     // Get Flowrate
     float _avgFlowRate = float(_pulsePerMin) * calibrationFactor;
-    waterflowData_.flowRate = _avgFlowRate;
-    waterflowData_.timestamp = 0; // implement timestamp here
-    interrupts();
 
+    waterflowData_.timestamp = timeHandler.getEpochTime();
+    waterflowData_.flowRate = _avgFlowRate;
+    
     publishQueue.push(waterflowData_);
+
+    // contruct JSON object here @kemal
+    // ...
+    // publishQueue.push(waterflowDataJSON_);
 
     // empty waterflowData_
     waterflowData_.timestamp = 0;
     waterflowData_.flowRate = 0.0;
     waterflowData_.totalVolume = 0.0;
+
+    // empty JSON object @kemal
+    // ...
 
     if (publishQueue.size() > PUBLISH_QUEUE_MAX_SIZE) {
         // discard data, in the assumption that normally queue will never reach MAX size

@@ -7,6 +7,7 @@
 enum InternetStatusCode {
     DISCONNECTED = 0,
     CONNECTED,
+    CONNECTING,
 };
 
 class InternetHandler{
@@ -14,9 +15,6 @@ class InternetHandler{
      void init();
      InternetStatusCode connect();
      InternetStatusCode checkConnection();
-
-    private:
-     InternetStatusCode internetStatus;
 };
 
 extern InternetHandler internetHandler;

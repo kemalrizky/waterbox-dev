@@ -3,7 +3,7 @@
 
 WaterflowSensorHandler* WaterflowSensorHandler::pSensorHandler = nullptr; // Initialize the static pointer
 
-WaterflowSensorHandler::WaterflowSensorHandler() : calibrationFactor(1.0) {
+WaterflowSensorHandler::WaterflowSensorHandler() : calibrationFactor_(1.0) {
     pSensorHandler = this;
 }
 
@@ -18,7 +18,7 @@ void WaterflowSensorHandler::init() {
 }
 
 void WaterflowSensorHandler::setCalibrationFactor(float _calibrationFactor) {
-    calibrationFactor = _calibrationFactor;
+    calibrationFactor_ = _calibrationFactor;
 }
 
 void WaterflowSensorHandler::updateVolumePerSec() {
@@ -28,7 +28,7 @@ void WaterflowSensorHandler::updateVolumePerSec() {
     pulseTick_ = 0; // pulseTick_ reset after successfully acquired
     
     // Get Flowrate
-    float _volumePerSec = float(_pulsePerSec) * calibrationFactor;   // uncomment for flowrate measurement in L/s
+    float _volumePerSec = float(_pulsePerSec) * calibrationFactor_;   // uncomment for flowrate measurement in L/s
 
     waterflowData_.totalVolume += _volumePerSec; // langsung ditambahkan ke volume dengan asumsi ini sudah per detik, jadi langsung dalam L saja
 
@@ -41,24 +41,28 @@ void WaterflowSensorHandler::updateQueuePerMin() {
     pulsePerMin_ = 0; // pulsePerMin_ reset after successfully acquired
     
     // Get Flowrate
-    float _avgFlowRate = float(_pulsePerMin) * calibrationFactor;
+    float _avgFlowRate = float(_pulsePerMin) * calibrationFactor_;
 
     waterflowData_.timestamp = timeHandler.getEpochTime();
     waterflowData_.flowRate = _avgFlowRate;
-    
-    publishQueue.push(waterflowData_);
 
-    // contruct JSON object here @kemal
-    // ...
-    // publishQueue.push(waterflowDataJSON_);
+    // contruct JSON object 
+    waterflowDataJson_["time"] = waterflowData_.timestamp;
+    waterflowDataJson_["total_volume"] = waterflowData_.totalVolume;
+    waterflowDataJson_["flowrate"] = waterflowData_.flowRate;
+    
+    // enqueue waterflow data to publish queue
+    publishQueue.push(waterflowDataJson_);
 
     // empty waterflowData_
     waterflowData_.timestamp = 0;
     waterflowData_.flowRate = 0.0;
     waterflowData_.totalVolume = 0.0;
 
-    // empty JSON object @kemal
-    // ...
+    // empty JSON object 
+    waterflowDataJson_["time"] = 0;
+    waterflowDataJson_["total_volume"] = 0.0;
+    waterflowDataJson_["flowrate"] = 0.0;
 
     if (publishQueue.size() > PUBLISH_QUEUE_MAX_SIZE) {
         // discard data, in the assumption that normally queue will never reach MAX size
@@ -80,7 +84,7 @@ bool WaterflowSensorHandler::isEmpty() {
     return publishQueue.empty();
 }
 
-waterflowData_t WaterflowSensorHandler::getData() {
+JsonDocument WaterflowSensorHandler::getData() {
     return publishQueue.front();
 }
 

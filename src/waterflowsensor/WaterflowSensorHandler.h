@@ -5,6 +5,7 @@
 #include <queue>
 #include "../Time/TimeHandler.h"
 #include "../Global.h"
+#include <ArduinoJson.h>
 
 #define FLOW_SENSOR_GPIO 15
 #define PUBLISH_QUEUE_MAX_SIZE 5
@@ -24,7 +25,7 @@ class WaterflowSensorHandler {
      void updateQueuePerMin();
 
      bool isEmpty();
-     waterflowData_t getData();
+     JsonDocument getData();
      void dequeueData();
 
      void dummyPulse();
@@ -40,13 +41,14 @@ class WaterflowSensorHandler {
      static WaterflowSensorHandler* pSensorHandler;
      static void IRAM_ATTR onInterrupt();
 
-     std::queue<waterflowData_t> publishQueue;
-    //  std::queue<JSON_t> publishQueue; // change to JSON object type @kemal
+     std::queue<JsonDocument> publishQueue; 
      waterflowData_t waterflowData_;
      volatile unsigned int pulseTick_;
      volatile unsigned int pulsePerMin_;
 
-     float calibrationFactor;
+     float calibrationFactor_;
+
+     JsonDocument waterflowDataJson_;
 };
 
 #endif

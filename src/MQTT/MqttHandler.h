@@ -12,6 +12,7 @@ class MqttHandler{
     public:
      void setup();
      bool connect();
+     bool publish(String, long);
      bool publish(String, float);
      void subscribe(String);
      void loop();

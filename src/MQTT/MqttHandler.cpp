@@ -44,6 +44,22 @@ void MqttHandler::subscribe(String _topic) {
 
 void MqttHandler::loop() { mqttClient.loop(); }
 
+bool MqttHandler::publish(String _measurement, long _data) {
+  String _topic = "waterbox/" + deviceIdGenerator.getId() + "/" + _measurement;
+  
+  // Convert float to string
+  String _payload = String(_data);
+
+  if (mqttClient.publish(_topic.c_str(), _payload.c_str())) {
+    Serial.println("Data published.");
+    return true;
+  } else {
+    Serial.print("failed to publish, rc=");
+    Serial.print(mqttClient.state());
+    return false;
+  }
+}
+
 bool MqttHandler::publish(String _measurement, float _data) {
   String _topic = "waterbox/" + deviceIdGenerator.getId() + "/" + _measurement;
   

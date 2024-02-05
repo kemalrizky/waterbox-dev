@@ -44,12 +44,57 @@ void MqttHandler::subscribe(String _topic) {
 
 void MqttHandler::loop() { mqttClient.loop(); }
 
-bool MqttHandler::publish(JsonDocument _data) {
-  String _topic = "waterbox/" + deviceIdGenerator.getId();
-  
-  // Serialize JSON object to a temporary buffer
-  char _payload[256];
-  serializeJson(_data, _payload);
+bool MqttHandler::publish(String _topic, String _data) {
+  // Convert long to string
+  String _payload = _data;
+
+  if (mqttClient.publish(_topic.c_str(), _payload.c_str())) {
+    Serial.println("Data published.");
+    return true;
+  } else {
+    Serial.print("failed to publish, rc=");
+    Serial.print(mqttClient.state());
+    return false;
+  }
+}
+
+bool MqttHandler::publish(String _topic, long _data) {
+  // Convert long to string
+  String _payload = String(_data);
+
+  if (mqttClient.publish(_topic.c_str(), _payload.c_str())) {
+    Serial.println("Data published.");
+    return true;
+  } else {
+    Serial.print("failed to publish, rc=");
+    Serial.print(mqttClient.state());
+    return false;
+  }
+}
+
+bool MqttHandler::publish(String _topic, float _data) {
+  // Convert float to string
+  char _payload[7];  // max 999.99
+  dtostrf(_data, 3, 2, _payload);
+
+  if (mqttClient.publish(_topic.c_str(), _payload)) {
+    Serial.println("Data published.");
+    return true;
+  } else {
+    Serial.print("failed to publish, rc=");
+    Serial.print(mqttClient.state());
+    return false;
+  }
+}
+
+#define MAX_MQTT_PUBLISH_PAYLOAD_SIZE 256
+bool MqttHandler::publish(String _topic, JsonDocument _data) {
+  // do check, if JsonDocument converted size is larger than char[256], if so log error
+  // ...
+
+  char _payload[MAX_MQTT_PUBLISH_PAYLOAD_SIZE];
+  serializeJson(_data,
+                _payload);  // Serialize JSON object to a temporary buffer
 
   if (mqttClient.publish(_topic.c_str(), _payload)) {
     Serial.println("Data published.");
@@ -72,7 +117,7 @@ bool MqttHandler::isConnected() {
 }
 
 void MqttHandler::reconnectTask(void* pv) {
-  MqttHandler* mqttHandler = (MqttHandler*) pv;
+  MqttHandler* mqttHandler = (MqttHandler*)pv;
 
   while (1) {
     // Mantaining mqtt connection
@@ -92,7 +137,7 @@ void MqttHandler::reconnectTask(void* pv) {
           }
         } else {
           // log fail to connect to internet
-            // ...
+          // ...
         }
       } else {
         if (mqttHandler->connect()) {

@@ -13,7 +13,10 @@ class MqttHandler{
     public:
      void setup();
      bool connect();
-     bool publish(JsonDocument);
+     bool publish(String, String);
+     bool publish(String, long);
+     bool publish(String, float);
+     bool publish(String, JsonDocument);
      void subscribe(String);
      void loop();
      bool isConnected();

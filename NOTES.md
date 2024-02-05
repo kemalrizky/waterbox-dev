@@ -106,4 +106,4 @@ ts:<timestamp>,ispub:<isPublished>,fr:<flowRate>,vol:<volume>;
     - [x] add MDNS to `OtaHandler` so that the Ota Server can be accessed by a more user friendly hostname (e.g. deviceId.local)
     - [x] create sample project: [esp-mdns](https://github.com/kemalrizky/esp32-mdns)
     - [x] use deviceId as mqtt client name in mqttHandler.connect()
-    - [x] integrate deviceId to mqtt topic, before: "waterbox/W0002/measurement" --> after "waterbox/deviceId/measurement"
+- [x] change the data type to be published to JSON

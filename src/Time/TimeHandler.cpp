@@ -52,5 +52,6 @@ void TimeHandler::printLocalTime()
     Serial.println("Failed to obtain time");
     return;
   }
+  Serial.print("Timestamp: ");
   Serial.println(&timeinfo, "%d/%b/%Y %H:%M:%S");
 }

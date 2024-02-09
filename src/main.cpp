@@ -83,6 +83,7 @@ void publishTask(void * pv) {
 
           vTaskDelay(1000);
         }
+        lastPublish = millis();
       } else {
         // log that mqtt not connected
       }

@@ -28,11 +28,10 @@ void setup() {
 
   deviceIdGenerator.init();
 
-  ledHandler.setup();
-  ledHandler.turnOn(POWER_LED_PINOUT);
+  ledHandler.init();
 
   internetHandler.init();
-  mqttHandler.setup();
+  mqttHandler.init();
   otaHandler.init();
 
   xTaskCreate(mqttHandler.reconnectTask, "mqttReconnectTask", 1024 * 5, &mqttHandler, 3, NULL);
@@ -79,7 +78,7 @@ void publishTask(void * pv) {
           if(mqttHandler.publish(String("waterbox/" + deviceIdGenerator.getId()), waterflowSensorHandler.getData())) {
             waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
 
-            ledHandler.blink(DATA_LED_PINOUT);
+            ledHandler.blinkTelemetryLed();
           }
 
           vTaskDelay(1000);

@@ -41,7 +41,7 @@ void setup() {
   timeHandler.init();
 
   // DUMMY WATERFLOW INTERRUPT FOR DEVELOPMENT PURPOSES
-  // xTaskCreate(waterflowSensorHandler.dummyPulseTask, "dummyPulseTask", 1024 * 1, &waterflowSensorHandler, 1, NULL);
+  xTaskCreate(waterflowSensorHandler.dummyPulseTask, "dummyPulseTask", 1024 * 1, &waterflowSensorHandler, 1, NULL);
 
 
   waterflowSensorHandler.init();

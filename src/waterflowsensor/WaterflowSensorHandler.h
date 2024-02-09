@@ -1,5 +1,4 @@
-#ifndef SENSOR_HANDLER_H
-#define SENSOR_HANDLER_H
+#pragma once
 
 #include <Wire.h>
 #include <queue>
@@ -50,5 +49,3 @@ class WaterflowSensorHandler {
 
      JsonDocument waterflowDataJson_;
 };
-
-#endif

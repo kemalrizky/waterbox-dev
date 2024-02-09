@@ -1,5 +1,4 @@
-#ifndef OTA_HANDLER_H
-#define OTA_HANDLER_H
+#pragma once
 
 #include <WebServer.h>
 #include <ESP2SOTA.h>
@@ -15,4 +14,3 @@ class OtaHandler {
      WebServer *server = nullptr;
 };
 
-#endif

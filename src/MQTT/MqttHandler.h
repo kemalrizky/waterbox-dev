@@ -1,5 +1,4 @@
-#ifndef MQTT_HANDLER_H
-#define MQTT_HANDLER_H
+#pragma once
 
 #include "Global.h"
 #include <PubSubClient.h>
@@ -8,10 +7,11 @@
 #include "InternetHandler.h"
 #include "DeviceIdGenerator.h"
 #include <ArduinoJson.h>
+#include "led/LedHandler.h"
 
 class MqttHandler{
     public:
-     void setup();
+     void init();
      bool connect();
      bool publish(String, String);
      bool publish(String, long);
@@ -30,6 +30,5 @@ class MqttHandler{
 
 void callback(char *, byte *, unsigned int);
 
-#endif
 
 

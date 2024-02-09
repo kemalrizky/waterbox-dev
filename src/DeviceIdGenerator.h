@@ -1,5 +1,4 @@
-#ifndef DEVICEIDGENERATOR_H
-#define DEVICEIDGENERATOR_H
+#pragma once
 
 #include "Global.h"
 #include <WiFi.h>
@@ -15,4 +14,3 @@ class DeviceIdGenerator {
 };
 
 extern DeviceIdGenerator deviceIdGenerator;
-#endif

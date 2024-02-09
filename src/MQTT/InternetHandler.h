@@ -1,5 +1,4 @@
-#ifndef INTERNET_HANDLER_H
-#define INTERNET_HANDLER_H
+#pragma once
 
 #include "credentials.h"
 #include <WiFi.h>
@@ -19,4 +18,3 @@ class InternetHandler{
 
 extern InternetHandler internetHandler;
 
-#endif

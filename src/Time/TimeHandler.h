@@ -1,5 +1,4 @@
-#ifndef TIME_HANDLER_H
-#define TIME_HANDLER_H
+#pragma once
 
 // #include <NTPClient.h>
 // #include <WiFiUdp.h>
@@ -27,5 +26,3 @@ class TimeHandler {
 };
 
 extern TimeHandler timeHandler;
-
-#endif

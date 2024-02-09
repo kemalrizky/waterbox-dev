@@ -22,18 +22,15 @@ void MqttHandler::init() {
 }
 
 bool MqttHandler::connect() {
-  Serial.print("Attempting MQTT connection...");
-
   if (mqttClient.connect(deviceIdGenerator.getId().c_str())) {
-    Serial.println(" connected");
+    Serial.println("Connected to MQTT server");
     // resubscribe to all topics
     // ...
 
     return true;
   } else {
-    Serial.print("failed, rc=");
+    Serial.print("Connection to MQTT server failed, rc=");
     Serial.print(mqttClient.state());
-    Serial.println(" try again in 1 seconds");
     return false;
   }
 }

@@ -6,7 +6,7 @@
 #include "../Global.h"
 #include <ArduinoJson.h>
 
-#define FLOW_SENSOR_GPIO 15
+#define FLOW_SENSOR_GPIO 4
 #define PUBLISH_QUEUE_MAX_SIZE 5
 
 struct waterflowData_t {

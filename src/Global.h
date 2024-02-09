@@ -15,5 +15,5 @@
 
 // Waterflow Business Logic
 #define READ_VOLUME_INTERVAL_MS    1000
-#define READ_FLOW_INTERVAL_MS      1000 // 60000
-#define PUBLISH_INTERVAL_MS        1000 // 60000
+#define READ_FLOW_INTERVAL_MS      60000 // 60000
+#define PUBLISH_INTERVAL_MS        60000 // 60000

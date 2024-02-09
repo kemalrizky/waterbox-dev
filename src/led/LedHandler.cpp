@@ -20,13 +20,13 @@ void LedHandler::setInternetLedOnEvent(InternetStatusCode _internetStatus) {
     {
     case CONNECTED:
         digitalWrite(LED_INTERNET_R_PINOUT, LOW);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
         digitalWrite(LED_INTERNET_G_PINOUT, HIGH);
         break;
     
     case DISCONNECTED:
         digitalWrite(LED_INTERNET_G_PINOUT, LOW);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
         digitalWrite(LED_INTERNET_R_PINOUT, HIGH);
         break;
     }

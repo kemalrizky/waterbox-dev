@@ -16,7 +16,7 @@ void callback(char* _topic, byte* _payload, unsigned int _length) {
   Serial.println();
 }
 
-void MqttHandler::setup() {
+void MqttHandler::init() {
   mqttClient.setClient(wifiClient);
   mqttClient.setServer(MQTT_SERVER, 1883);
 }
@@ -120,17 +120,16 @@ void MqttHandler::reconnectTask(void* pv) {
   MqttHandler* mqttHandler = (MqttHandler*)pv;
 
   while (1) {
-    // Mantaining mqtt connection
+    // Mantaining connection to MQTT Server
     if (!mqttHandler->isConnected()) {
-      ledHandler.turnOff(CONNECTION_LED_PINOUT);
-
       if (internetHandler.checkConnection() ==
           InternetStatusCode::DISCONNECTED) {
+            ledHandler.setInternetLedOnEvent(InternetStatusCode::DISCONNECTED);
         if (internetHandler.connect()) {
+          ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
           vTaskDelay(1000);
           if (mqttHandler->connect()) {
             vTaskDelay(1000);
-            ledHandler.turnOn(CONNECTION_LED_PINOUT);
           } else {
             // log fail to connect to mqtt
             // ...
@@ -140,9 +139,9 @@ void MqttHandler::reconnectTask(void* pv) {
           // ...
         }
       } else {
+        ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
         if (mqttHandler->connect()) {
           vTaskDelay(1000);
-          ledHandler.turnOn(CONNECTION_LED_PINOUT);
         } else {
           // log fail to connect to mqtt
           // ...

@@ -1,25 +1,33 @@
 #include "LedHandler.h"
-#include "global.h"
 
-void LedHandler::setup() {
-    pinMode(POWER_LED_PINOUT, OUTPUT);
-    pinMode(CONNECTION_LED_PINOUT, OUTPUT);
-    pinMode(DATA_LED_PINOUT, OUTPUT);
+void LedHandler::init() {
+    pinMode(LED_INTERNET_B_PINOUT, OUTPUT);
+    pinMode(LED_INTERNET_G_PINOUT, OUTPUT);
+    pinMode(LED_INTERNET_R_PINOUT, OUTPUT);
+
+    pinMode(LED_TELEMETRY_PINOUT, OUTPUT);
 }
 
-void LedHandler::turnOn(int _pinout) {
-    digitalWrite(_pinout, HIGH);
+
+void LedHandler::blinkTelemetryLed() {
+    digitalWrite(LED_TELEMETRY_PINOUT, HIGH);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+    digitalWrite(LED_TELEMETRY_PINOUT, LOW);
 }
 
-void LedHandler::turnOff(int _pinout) {
-    digitalWrite(_pinout, LOW);
-}
-
-void LedHandler::blink(int _pinout) {
-    digitalWrite(_pinout, HIGH);
+void LedHandler::setInternetLedOnEvent(InternetStatusCode _internetStatus) {
+    switch (_internetStatus)
+    {
+    case CONNECTED:
+        digitalWrite(LED_INTERNET_R_PINOUT, LOW);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        digitalWrite(LED_INTERNET_G_PINOUT, HIGH);
+        break;
     
-    lastOn = millis();
-    while(lastOn - millis() < 500){}
-
-    digitalWrite(_pinout, LOW);
+    case DISCONNECTED:
+        digitalWrite(LED_INTERNET_G_PINOUT, LOW);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        digitalWrite(LED_INTERNET_R_PINOUT, HIGH);
+        break;
+    }
 }

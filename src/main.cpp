@@ -5,8 +5,6 @@
 #include "OTA/OtaHandler.h"
 #include "waterflowsensor/WaterflowSensorHandler.h"
 #include "led/LedHandler.h"
-#include "DataLogger/FileHandler.h"
-#include "DataLogger/DataLogger.h"
 
 TimeHandler timeHandler;
 LedHandler ledHandler;
@@ -17,8 +15,6 @@ MqttHandler mqttHandler;
 OtaHandler otaHandler;
 
 WaterflowSensorHandler waterflowSensorHandler;
-
-DataLogger dataLogger;
 
 void publishTask(void *);
 void flushTask(void *);

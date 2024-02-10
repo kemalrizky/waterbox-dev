@@ -119,13 +119,14 @@ void MqttHandler::reconnectTask(void* pv) {
   while (1) {
     // Mantaining connection to MQTT Server
     if (!mqttHandler->isConnected()) {
+      ledHandler.setInternetLedOnEvent(InternetStatusCode::DISCONNECTED);
       if (internetHandler.checkConnection() ==
           InternetStatusCode::DISCONNECTED) {
-            ledHandler.setInternetLedOnEvent(InternetStatusCode::DISCONNECTED);
         if (internetHandler.connect()) {
-          ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
+          
           vTaskDelay(1000);
           if (mqttHandler->connect()) {
+            ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
             vTaskDelay(1000);
           } else {
             // log fail to connect to mqtt
@@ -136,8 +137,8 @@ void MqttHandler::reconnectTask(void* pv) {
           // ...
         }
       } else {
-        ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
         if (mqttHandler->connect()) {
+          ledHandler.setInternetLedOnEvent(InternetStatusCode::CONNECTED);
           vTaskDelay(1000);
         } else {
           // log fail to connect to mqtt

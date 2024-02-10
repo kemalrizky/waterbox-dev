@@ -7,7 +7,6 @@
 #include "InternetHandler.h"
 #include "DeviceIdGenerator.h"
 #include <ArduinoJson.h>
-#include "led/LedHandler.h"
 
 class MqttHandler{
     public:

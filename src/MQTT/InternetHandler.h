@@ -2,6 +2,7 @@
 
 #include "credentials.h"
 #include <WiFi.h>
+#include "Global.h"
 
 enum InternetStatusCode {
     DISCONNECTED = 0,

@@ -1,8 +1,9 @@
 #include "DeviceIdGenerator.h"
+#include "esp_random.h"
 
 void DeviceIdGenerator::generateId() {
     String _macAddr = WiFi.macAddress();
-    deviceId_ = "WBX-" + _macAddr.substring(0,2) + _macAddr.substring(6,8) + _macAddr.substring(12,14);
+    deviceId_ = "WBX-" + _macAddr.substring(0,2) + _macAddr.substring(6,8) + _macAddr.substring(12,14) + String(esp_random());
 }
 
 void DeviceIdGenerator::init() {

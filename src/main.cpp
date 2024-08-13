@@ -22,6 +22,7 @@ DataLogger dataLogger;
 
 void publishTask(void *);
 void flushTask(void *);
+void interfaceTask(void *);
 
 void setup() {
   Serial.begin(115200);
@@ -45,7 +46,6 @@ void setup() {
 
 
   waterflowSensorHandler.init();
-  waterflowSensorHandler.setCalibrationFactor(0.117);
 }
 
 void loop() {
@@ -96,6 +96,19 @@ void flushTask(void * pv) {
   while(1) {
     // check if flushQueue.txt is not empty
     //
+    vTaskDelay(1000); 
+  }
+}
+
+void interfaceTask(void * pv) {
+  while(1) {
+    // check if interface accessed
+    if (false) {
+      // get value
+      float _calibrationFactor = 0.117;
+      // set value
+      waterflowSensorHandler.setCalibrationFactor(_calibrationFactor);
+    }
     vTaskDelay(1000); 
   }
 }

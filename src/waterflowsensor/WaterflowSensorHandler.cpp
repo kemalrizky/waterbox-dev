@@ -14,6 +14,12 @@ void IRAM_ATTR WaterflowSensorHandler::onInterrupt() {
 
 void WaterflowSensorHandler::init() {
     attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR_GPIO), onInterrupt, FALLING);
+
+    // check if calibration factor exists in local storage
+    // ...
+
+    // else
+    setCalibrationFactor(DEFAULT_CALIBRATION_FACTOR);
 }
 
 void WaterflowSensorHandler::setCalibrationFactor(float _calibrationFactor) {

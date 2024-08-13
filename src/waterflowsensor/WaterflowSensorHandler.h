@@ -8,6 +8,7 @@
 
 #define FLOW_SENSOR_GPIO 4
 #define PUBLISH_QUEUE_MAX_SIZE 5
+#define DEFAULT_CALIBRATION_FACTOR 0.117
 
 struct waterflowData_t {
     long timestamp = 0;

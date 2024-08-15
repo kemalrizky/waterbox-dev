@@ -7,6 +7,8 @@
 #include "led/LedHandler.h"
 #include "DataLogger/FileHandler.h"
 #include "DataLogger/DataLogger.h"
+#include "storage/ConfigStorage.h"
+#include "webserver/ConfigWebServer.h"
 
 TimeHandler timeHandler;
 LedHandler ledHandler;
@@ -19,6 +21,8 @@ OtaHandler otaHandler;
 WaterflowSensorHandler waterflowSensorHandler;
 
 DataLogger dataLogger;
+ConfigStorage configStorage;
+ConfigWebServer configWebServer;
 
 void publishTask(void *);
 void flushTask(void *);
@@ -34,6 +38,8 @@ void setup() {
   internetHandler.init();
   mqttHandler.init();
   otaHandler.init();
+
+  configWebServer.init();
 
   xTaskCreate(mqttHandler.reconnectTask, "mqttReconnectTask", 1024 * 5, &mqttHandler, 3, NULL);
   xTaskCreate(publishTask, "publishTask", 1024 * 2, NULL, 1, NULL);

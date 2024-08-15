@@ -107,3 +107,9 @@ ts:<timestamp>,ispub:<isPublished>,fr:<flowRate>,vol:<volume>;
     - [x] create sample project: [esp-mdns](https://github.com/kemalrizky/esp32-mdns)
     - [x] use deviceId as mqtt client name in mqttHandler.connect()
 - [x] change the data type to be published to JSON
+
+---
+
+# To Do
+- implement preferences as local storage
+- implement async http server for interfacing

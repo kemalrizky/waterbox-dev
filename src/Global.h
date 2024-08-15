@@ -1,7 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
+#include "MQTT/credentials.h"
 
+#ifndef WIFI_CREDENTIALS_H
 // Internet
 #ifndef WIFI_SSID
 #define WIFI_SSID "FILL_IN_WIFI_SSID_HERE"
@@ -12,6 +14,7 @@
 #ifndef MQTT_SERVER
 #define MQTT_SERVER "FILL_IN_MQTT_SERVER_HERE"
 #endif
+#endif // WIFI_CREDENTIALS_H
 
 // Waterflow Business Logic
 #define READ_VOLUME_INTERVAL_MS    1000

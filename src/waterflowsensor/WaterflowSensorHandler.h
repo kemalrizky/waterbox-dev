@@ -5,6 +5,7 @@
 #include "../Time/TimeHandler.h"
 #include "../Global.h"
 #include <ArduinoJson.h>
+#include "storage/ConfigStorage.h"
 
 #define FLOW_SENSOR_GPIO 4
 #define PUBLISH_QUEUE_MAX_SIZE 5
@@ -50,3 +51,5 @@ class WaterflowSensorHandler {
 
      JsonDocument waterflowDataJson_;
 };
+
+extern WaterflowSensorHandler waterflowSensorHandler;

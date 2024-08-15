@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "storage/ConfigStorage.h"
+#include "waterflowsensor/WaterflowSensorHandler.h"
 #include "MQTT/InternetHandler.h"
 
 #define AP_SSID "ESP32-Access-Point"

@@ -105,16 +105,3 @@ void flushTask(void * pv) {
     vTaskDelay(1000); 
   }
 }
-
-void interfaceTask(void * pv) {
-  while(1) {
-    // check if interface accessed
-    if (false) {
-      // get value
-      float _calibrationFactor = 0.117;
-      // set value
-      waterflowSensorHandler.setCalibrationFactor(_calibrationFactor);
-    }
-    vTaskDelay(1000); 
-  }
-}

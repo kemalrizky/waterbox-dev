@@ -61,6 +61,7 @@ void ConfigWebServer::endPointRegister(AsyncWebServer *_server)
       inputParam = PARAM_INPUT;
 
       configStorage.setCalibrationFactor(inputMessage.toFloat());
+      waterflowSensorHandler.setCalibrationFactor(configStorage.getCalibrationFactor());
     }
     else {
       inputMessage = "No message sent";

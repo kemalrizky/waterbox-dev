@@ -26,7 +26,7 @@ void ConfigWebServer::init()
     internetHandler.connect();
   }
 
-  server = new AsyncWebServer(80);
+  server = new AsyncWebServer(90);
   endPointRegister(server);
   server->begin();
 }

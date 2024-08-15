@@ -1,7 +1,19 @@
 #include "InternetHandler.h"
 
 void InternetHandler::init() {
+#if defined(WIFI_MODE_STA)
+    // STA Mode
+    Serial.println("WiFi Mode: Station");
     WiFi.mode(WIFI_STA);
+#elif defined(WIFI_MODE_AP)
+    // AP Mode
+    Serial.println("WiFi Mode: Access Point (AP)");
+    WiFi.mode(WIFI_AP);
+#elif defined(WIFI_MODE_AP_STA)
+    // AP & STA Mode
+    Serial.println("WiFi Mode: Access Point (AP) & Station");
+    WiFi.mode(WIFI_AP_STA);
+#endif // WIFI_MODE_STA
 }
 
 InternetStatusCode InternetHandler::checkConnection() {
@@ -14,6 +26,7 @@ InternetStatusCode InternetHandler::checkConnection() {
 }
 
 InternetStatusCode InternetHandler::connect() {
+#if defined(WIFI_MODE_STA) || defined(WIFI_MODE_AP_STA)
     Serial.println("Connecting to WiFi..");
     WiFi.disconnect();
     WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -21,6 +34,9 @@ InternetStatusCode InternetHandler::connect() {
     // polling until successfully connected or timeout
     long _timeout = millis() + 10000;
     while (WiFi.status() != WL_CONNECTED && millis() < _timeout);
+#else
+    Serial.println("WiFi Mode STA inactive.. do nothing");
+#endif // WIFI_MODE_STA || defined(WIFI_MODE_AP_STA)
 
     switch (WiFi.status()) {
         case WL_DISCONNECTED:
@@ -37,7 +53,7 @@ InternetStatusCode InternetHandler::connect() {
             break;
         case WL_CONNECTED:
             Serial.println("WiFi connected.");
-            Serial.print("IP address: ");
+            Serial.print("STA IP address: ");
             Serial.println(WiFi.localIP());
             return CONNECTED;
             break;
@@ -46,4 +62,11 @@ InternetStatusCode InternetHandler::connect() {
             return DISCONNECTED;
             break;
     }
+
+#ifdef WIFI_MODE_AP || defined(WIFI_MODE_AP_STA)
+    Serial.println("Activating WiFi AP \"" + String(AP_SSID) + "\"");
+    WiFi.softAP(AP_SSID, AP_PASS);
+    Serial.print("AP IP Address: ");
+    Serial.println(WiFi.softAPIP());
+#endif
 }

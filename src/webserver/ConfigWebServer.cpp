@@ -22,7 +22,9 @@ void ConfigWebServer::init()
 {
   configStorage.init();
 
-  // internetConnect();
+  if (!internetHandler.checkConnection()) {
+    internetHandler.connect();
+  }
 
   server = new AsyncWebServer(80);
   endPointRegister(server);
@@ -70,51 +72,4 @@ void ConfigWebServer::endPointRegister(AsyncWebServer *_server)
                                      "<br><a href=\"/\">Return to Home Page</a>"); });
 
     server->onNotFound(&ConfigWebServer::notFound);
-}
-
-/**
- * internetConnect() is purposefully placed outside, expecting within
- * a bigger codebase, the internetHandler or such would be within it's
- * own class
- */
-void internetConnect() {  
-#ifdef WIFI_MODE_STA
-    // STA Mode
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-    if (WiFi.waitForConnectResult() != WL_CONNECTED)
-    {
-        Serial.printf("WiFi Failed!\n");
-        return;
-    }
-
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
-
-#elif defined(WIFI_MODE_AP)
-    // AP Mode
-    // WiFi.mode(WIFI_AP);
-    WiFi.softAP(AP_SSID, AP_PASS);
-
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());
-#elif defined(WIFI_MODE_AP_STA)
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-    if (WiFi.waitForConnectResult() != WL_CONNECTED)
-    {
-        Serial.printf("WiFi Failed!\n");
-        return;
-    }
-
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
-
-        WiFi.softAP(AP_SSID, AP_PASS);
-
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());
-#endif // WIFI_MODE_STA
 }

@@ -5,12 +5,12 @@
 class ConfigStorage {
     public:
         void init();
-        void saveCalibrationFactor();
-        void loadCalibrationFactor();
         void setCalibrationFactor(float);
         float getCalibrationFactor();
 
     private:
+        void saveCalibrationFactor();
+        void loadCalibrationFactor();
         float calibrationFactor = 0;
         Preferences preferences;
 };

@@ -67,7 +67,6 @@ void ConfigWebServer::endPointRegister(AsyncWebServer *_server)
       inputMessage = "No message sent";
       inputParam = "none";
     }
-    Serial.println(inputMessage);
     request->send(200, "text/html", "HTTP GET request sent to your ESP on input field (" 
                                      + inputParam + ") with value: " + inputMessage +
                                      "<br><a href=\"/\">Return to Home Page</a>"); });

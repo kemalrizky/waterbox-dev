@@ -16,10 +16,15 @@ void WaterflowSensorHandler::init() {
     attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR_GPIO), onInterrupt, FALLING);
 
     // check if calibration factor exists in local storage
-    setCalibrationFactor(configStorage.getCalibrationFactor());
-
-    // else
-    // setCalibrationFactor(DEFAULT_CALIBRATION_FACTOR);
+    float _calibrationFactor = 0.0;
+    _calibrationFactor = configStorage.getCalibrationFactor();
+    if (!_calibrationFactor == 0.0) {
+        // assumption: the calibration factor can NOT be precisely 0.0
+        setCalibrationFactor(_calibrationFactor);
+    } else {
+        setCalibrationFactor(DEFAULT_CALIBRATION_FACTOR);
+        configStorage.setCalibrationFactor(calibrationFactor_);
+    }
 }
 
 void WaterflowSensorHandler::setCalibrationFactor(float _calibrationFactor) {

@@ -73,7 +73,6 @@ void publishTask(void * pv) {
         while(!waterflowSensorHandler.isEmpty()) {
           if(mqttHandler.publish(String("waterbox/" + deviceIdGenerator.getId()), waterflowSensorHandler.getData())) {
             waterflowSensorHandler.dequeueData(); // removed successfully published data from waterflowSensorHandler.publishQueue
-
             ledHandler.blinkTelemetryLed();
           }
 

@@ -18,7 +18,7 @@ void callback(char* _topic, byte* _payload, unsigned int _length) {
 
 void MqttHandler::init() {
   mqttClient.setClient(wifiClient);
-  mqttClient.setServer(MQTT_SERVER, 1883);
+  mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
 }
 
 bool MqttHandler::connect() {

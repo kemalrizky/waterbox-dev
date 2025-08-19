@@ -8,7 +8,7 @@
 
 #define NTP_SERVER "pool.ntp.org"
 #define GMT_OFFSET_MULTIPLIER 7
-#define DAYLIGHT_OFFSET_SEC_MULTIPLIER 1
+#define DAYLIGHT_OFFSET_SEC_MULTIPLIER 0
 
 class TimeHandler {
  public:

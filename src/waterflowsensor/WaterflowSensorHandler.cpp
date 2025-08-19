@@ -46,6 +46,9 @@ void WaterflowSensorHandler::updateQueuePerMin() {
     waterflowData_.timestamp = timeHandler.getEpochTime();
     waterflowData_.flowRate = _avgFlowRate;
 
+    Serial.print("Flow rate: ");
+    Serial.println(waterflowData_.flowRate);
+
     // contruct JSON object 
     waterflowDataJson_["time"] = waterflowData_.timestamp;
     waterflowDataJson_["total_volume"] = waterflowData_.totalVolume;

@@ -4,13 +4,14 @@
 
 // Internet
 #ifndef WIFI_SSID
-#define WIFI_SSID "FILL_IN_WIFI_SSID_HERE"
-#define WIFI_PASS "FILL_IN_WIFI_PASS_HERE"
+#define WIFI_SSID "WBX_AP"
+#define WIFI_PASS "groundEx2022"
 #endif
 
 // MQTT Server
 #ifndef MQTT_SERVER
-#define MQTT_SERVER "FILL_IN_MQTT_SERVER_HERE"
+#define MQTT_SERVER "broker.emqx.io"
+#define MQTT_PORT 1883
 #endif
 
 // Waterflow Business Logic

@@ -41,7 +41,7 @@ void setup() {
 
 
   waterflowSensorHandler.init();
-  waterflowSensorHandler.setCalibrationFactor(0.117);
+  waterflowSensorHandler.setCalibrationFactor(0.0023);
 }
 
 void loop() {
